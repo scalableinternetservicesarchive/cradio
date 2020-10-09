@@ -252,5 +252,5 @@ Your Honeycomb instrumentation will provide all the data visualizations you need
 
 ![image](https://user-images.githubusercontent.com/1095573/93257787-3d892b00-f752-11ea-8219-e1789b42cbf0.png)
 
-Grant Roberts(Plus dog)
+### Grant Roberts(Plus dog)
 ![image](https://i.ibb.co/PWZmSD4/7479-C129-577-A-473-B-BC78-DE32-A5673291.jpg)
