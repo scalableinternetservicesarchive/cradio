@@ -6,12 +6,16 @@ Welcome to Cloud City!
 
 Members: 
 Dylan Breon (dbreon@ucla.edu) 
-
 ![image](https://i.ibb.co/VvDtFh2/JPEG-image.jpg)
 
+Grant Roberts plus dog (groberts96@gmail.com)
+![image](https://i.ibb.co/PWZmSD4/7479-C129-577-A-473-B-BC78-DE32-A5673291.jpg)
 
 Daniel Jaffe (daniel.jaffe@ucla.edu)
 ![image](https://scontent-sea1-1.xx.fbcdn.net/v/t31.0-8/12113273_10153149928706596_7031611948975133513_o.jpg?_nc_cat=105&_nc_sid=a4a2d7&_nc_ohc=605mYa4WmPgAX_fpmLz&_nc_ht=scontent-sea1-1.xx&oh=7e0a65ae055d0cc073e4451a99dfe100&oe=5FA4F2A9)
+
+Arpi ________
+(ADD STUFF HERE)  :D
 
 ## Dependencies
 
@@ -262,6 +266,3 @@ You may execute your user scripts locally or using a distributed exeucutor (AWS 
 Your Honeycomb instrumentation will provide all the data visualizations you need. Login to Honeycomb to view your server metrics.
 
 ![image](https://user-images.githubusercontent.com/1095573/93257787-3d892b00-f752-11ea-8219-e1789b42cbf0.png)
-
-Grant Roberts(Plus dog)
-![image](https://i.ibb.co/PWZmSD4/7479-C129-577-A-473-B-BC78-DE32-A5673291.jpg)
