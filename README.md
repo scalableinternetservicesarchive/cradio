@@ -6,7 +6,7 @@ Welcome to Cloud City!
 
 Members: 
 Dylan Breon (dbreon@ucla.edu) 
-![Image of Dylan]
+![image]
 (https://ibb.co/vJmHNrZ)
 
 ## Dependencies
