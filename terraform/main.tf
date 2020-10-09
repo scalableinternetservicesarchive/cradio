@@ -6,12 +6,12 @@ module "mysql" {
 #   source = "./modules/redis"
 # }
 
-resource "aws_ecs_cluster" "bespin" {
-  name = "bespin"
+resource "aws_ecs_cluster" "cradio" {
+  name = "cradio"
 }
 
-resource "aws_ecr_repository" "bespin" {
-  name                 = "bespin"
+resource "aws_ecr_repository" "cradio" {
+  name                 = "cradio"
   image_tag_mutability = "MUTABLE"
 }
 
@@ -19,8 +19,8 @@ module "webserver" {
   source = "./modules/appserver"
 
   appserver_tag  = "app-web"
-  ecr_repository = aws_ecr_repository.bespin.repository_url
-  ecs_cluster    = aws_ecs_cluster.bespin.id
+  ecr_repository = aws_ecr_repository.cradio.repository_url
+  ecs_cluster    = aws_ecs_cluster.cradio.id
 
   mysql_host = module.mysql.host
   # redis_host = module.redis.host
