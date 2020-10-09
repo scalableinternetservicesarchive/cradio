@@ -1,6 +1,6 @@
 ## Cradio
 
-Welcome to Cloud City!
+Crowdsourced Radio!
 
 # Group Informaion 
 
