@@ -8,7 +8,7 @@ Members:
 Dylan Breon (dbreon@ucla.edu) 
 
 ![image]
-(https://ibb.co/vJmHNrZhttps://i.ibb.co/VvDtFh2/JPEG-image.jpg)
+(https://i.ibb.co/VvDtFh2/JPEG-image.jpg)
 
 ## Dependencies
 
