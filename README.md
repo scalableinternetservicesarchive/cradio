@@ -6,9 +6,11 @@ Welcome to Cloud City!
 
 Members: 
 Dylan Breon (dbreon@ucla.edu) 
+
 ![image](https://i.ibb.co/VvDtFh2/JPEG-image.jpg)
 
 Grant Roberts plus dog (groberts96@gmail.com)
+
 ![image](https://i.ibb.co/PWZmSD4/7479-C129-577-A-473-B-BC78-DE32-A5673291.jpg)
 
 Daniel Jaffe (daniel.jaffe@ucla.edu)
