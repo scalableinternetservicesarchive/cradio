@@ -7,7 +7,7 @@ Welcome to Cloud City!
 Members: 
 Dylan Breon (dbreon@ucla.edu) 
 ![image]
-(https://ibb.co/vJmHNrZhttps://i.ibb.co/VvDtFh2/JPEG-image.jpg
+(https://ibb.co/vJmHNrZhttps://i.ibb.co/VvDtFh2/JPEG-image.jpg)
 ## Dependencies
 
 For the [Quickstart](https://github.com/rothfels/bespin#Quickstart), you will need:
