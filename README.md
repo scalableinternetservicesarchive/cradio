@@ -17,8 +17,11 @@ Daniel Jaffe (daniel.jaffe@ucla.edu)
 
 ![image](https://scontent-sea1-1.xx.fbcdn.net/v/t31.0-8/12113273_10153149928706596_7031611948975133513_o.jpg?_nc_cat=105&_nc_sid=a4a2d7&_nc_ohc=605mYa4WmPgAX_fpmLz&_nc_ht=scontent-sea1-1.xx&oh=7e0a65ae055d0cc073e4451a99dfe100&oe=5FA4F2A9)
 
-Arpi ________
-(ADD STUFF HERE)  :D
+Arpi Beshlikyan (aybeshlikyan@g.ucla.edu)
+
+![image](https://scontent-sea1-1.xx.fbcdn.net/v/t1.0-9/72277846_835520930179210_8981489885449814016_n.jpg?_nc_cat=106&_nc_sid=174925&_nc_ohc=6I1zNFgVwssAX88mx_n&_nc_ht=scontent-sea1-1.xx&oh=aeb981a674b44b63b924cd87faa2d621&oe=5FA82C29)
+
+
 
 ## Dependencies
 
