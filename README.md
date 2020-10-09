@@ -7,8 +7,7 @@ Welcome to Cloud City!
 Members: 
 Dylan Breon (dbreon@ucla.edu) 
 
-![image]
-(https://i.ibb.co/VvDtFh2/JPEG-image.jpg)
+![image](https://i.ibb.co/VvDtFh2/JPEG-image.jpg)
 
 
 Daniel Jaffe (daniel.jaffe@ucla.edu)
