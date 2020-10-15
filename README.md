@@ -1,11 +1,11 @@
-## Cradio
+# Cradio
 
 Crowdsourced Radio!
 
-# Group Informaion 
+## Group Informaion
 
-Members: 
-Dylan Breon (dbreon@ucla.edu) 
+Members:
+Dylan Breon (dbreon@ucla.edu)
 
 ![image](https://i.ibb.co/VvDtFh2/JPEG-image.jpg)
 
