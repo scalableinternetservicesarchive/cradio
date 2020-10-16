@@ -81,7 +81,7 @@ function Logout() {
   return (
     <>
       <Spacer $h5 />
-      <Button onClick={logout}>Logout</Button>
+      <Button onClick={logout}>Logout Now</Button>
     </>
   )
 }
