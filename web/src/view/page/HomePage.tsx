@@ -30,6 +30,8 @@ const Hero = style('div', 'mb4 w-100 ba b--mid-gray br2 pa3 tc', {
   borderRightWidth: '4px',
 })
 
+// this is a test comment
+
 // const Content = style('div', 'flex-l')
 
 // const LContent = style('div', 'flex-grow-0 w-70-l mr4-l')
