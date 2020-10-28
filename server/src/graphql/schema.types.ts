@@ -18,6 +18,7 @@ export interface Query {
   surveys: Array<Survey>
   survey?: Maybe<Survey>
   artist?: Maybe<Artist>
+  listeningSession?: Maybe<ListeningSession>
 }
 
 export interface QuerySurveyArgs {
@@ -26,6 +27,10 @@ export interface QuerySurveyArgs {
 
 export interface QueryArtistArgs {
   name: Scalars['String']
+}
+
+export interface QueryListeningSessionArgs {
+  sessionId: Scalars['Int']
 }
 
 export interface Mutation {
@@ -74,6 +79,22 @@ export interface Artist {
   name: Scalars['String']
   origin?: Maybe<Scalars['String']>
   songs: Array<Maybe<Song>>
+}
+
+export interface ListeningSession {
+  __typename?: 'ListeningSession'
+  id: Scalars['Int']
+  timeCreated: Scalars['Int']
+  owner: PartyRocker
+  partyRockers: Array<PartyRocker>
+}
+
+export interface PartyRocker {
+  __typename?: 'PartyRocker'
+  id: Scalars['Int']
+  name: Scalars['String']
+  spotifyCreds?: Maybe<Scalars['String']>
+  listeningSession?: Maybe<ListeningSession>
 }
 
 export enum UserType {
@@ -198,6 +219,8 @@ export type ResolversTypes = {
   User: ResolverTypeWrapper<User>
   Song: ResolverTypeWrapper<Song>
   Artist: ResolverTypeWrapper<Artist>
+  ListeningSession: ResolverTypeWrapper<ListeningSession>
+  PartyRocker: ResolverTypeWrapper<PartyRocker>
   UserType: UserType
   Survey: ResolverTypeWrapper<Survey>
   SurveyQuestion: ResolverTypeWrapper<SurveyQuestion>
@@ -216,6 +239,8 @@ export type ResolversParentTypes = {
   User: User
   Song: Song
   Artist: Artist
+  ListeningSession: ListeningSession
+  PartyRocker: PartyRocker
   Survey: Survey
   SurveyQuestion: SurveyQuestion
   SurveyAnswer: SurveyAnswer
@@ -235,6 +260,12 @@ export type QueryResolvers<
     RequireFields<QuerySurveyArgs, 'surveyId'>
   >
   artist?: Resolver<Maybe<ResolversTypes['Artist']>, ParentType, ContextType, RequireFields<QueryArtistArgs, 'name'>>
+  listeningSession?: Resolver<
+    Maybe<ResolversTypes['ListeningSession']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryListeningSessionArgs, 'sessionId'>
+  >
 }
 
 export type MutationResolvers<
@@ -302,6 +333,28 @@ export type ArtistResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type ListeningSessionResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['ListeningSession'] = ResolversParentTypes['ListeningSession']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  timeCreated?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  owner?: Resolver<ResolversTypes['PartyRocker'], ParentType, ContextType>
+  partyRockers?: Resolver<Array<ResolversTypes['PartyRocker']>, ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type PartyRockerResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['PartyRocker'] = ResolversParentTypes['PartyRocker']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  spotifyCreds?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  listeningSession?: Resolver<Maybe<ResolversTypes['ListeningSession']>, ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type SurveyResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Survey'] = ResolversParentTypes['Survey']
@@ -344,6 +397,8 @@ export type Resolvers<ContextType = any> = {
   User?: UserResolvers<ContextType>
   Song?: SongResolvers<ContextType>
   Artist?: ArtistResolvers<ContextType>
+  ListeningSession?: ListeningSessionResolvers<ContextType>
+  PartyRocker?: PartyRockerResolvers<ContextType>
   Survey?: SurveyResolvers<ContextType>
   SurveyQuestion?: SurveyQuestionResolvers<ContextType>
   SurveyAnswer?: SurveyAnswerResolvers<ContextType>
