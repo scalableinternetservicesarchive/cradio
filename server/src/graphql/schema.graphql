@@ -22,6 +22,7 @@ type Query {
   survey(surveyId: Int!): Survey
   artist(name: String!): Artist
   listeningSession(sessionId: Int!): ListeningSession
+  queue(sessionId: Int!): Queue
 }
 
 type Mutation {
@@ -71,6 +72,14 @@ type PartyRocker {
   name: String!
   spotifyCreds: String
   listeningSession: ListeningSession
+}
+
+type Queue {
+  id: Int!
+  score: Int!
+  position: Int!
+  song: Song!
+  listeningSession: ListeningSession!
 }
 
 enum UserType {
