@@ -1,5 +1,6 @@
 import { BaseEntity, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { PartyRocker } from './PartyRocker'
+import { Queue } from './Queue'
 
 @Entity()
 export class ListeningSession extends BaseEntity {
@@ -16,4 +17,6 @@ export class ListeningSession extends BaseEntity {
   @OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession)
   partyRockers: PartyRocker[]
 
+  @OneToMany(type => Queue, queue => queue.listeningSession)
+  queue: Queue[]
 }
