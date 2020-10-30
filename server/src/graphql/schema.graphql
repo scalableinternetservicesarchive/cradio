@@ -19,19 +19,22 @@ type Query {
   self: User
 
   surveys: [Survey!]!
-  survey (surveyId: Int!): Survey
+  survey(surveyId: Int!): Survey
+  artist(name: String!): Artist
+  listeningSession(sessionId: Int!): ListeningSession
+  queue(sessionId: Int!): Queue
 }
 
 type Mutation {
   # Records an answer to a survey question presented in class.
-  answerSurvey (input: SurveyInput!): Boolean!
+  answerSurvey(input: SurveyInput!): Boolean!
 
   # Moves the survey to the next question (or starts it if it hasn't started). ADMIN only.
-  nextSurveyQuestion (surveyId: Int!): Survey
+  nextSurveyQuestion(surveyId: Int!): Survey
 }
 
 type Subscription {
-  surveyUpdates (surveyId: Int!): Survey
+  surveyUpdates(surveyId: Int!): Survey
 }
 
 type User {
@@ -41,7 +44,48 @@ type User {
   name: String!
 }
 
-enum UserType { ADMIN, USER }
+type Song {
+  id: Int!
+  name: String!
+  genre: String!
+  duration: Int!
+  artist: Artist!
+}
+
+type Artist {
+  id: Int!
+  name: String!
+  origin: String
+  songs: [Song]!
+}
+
+#time created is time since epoch
+type ListeningSession {
+  id: Int!
+  timeCreated: Int!
+  owner: PartyRocker!
+  partyRockers: [PartyRocker!]!
+}
+
+type PartyRocker {
+  id: Int!
+  name: String!
+  spotifyCreds: String
+  listeningSession: ListeningSession
+}
+
+type Queue {
+  id: Int!
+  score: Int!
+  position: Int!
+  song: Song!
+  listeningSession: ListeningSession!
+}
+
+enum UserType {
+  ADMIN
+  USER
+}
 
 type Survey {
   id: Int!
@@ -88,4 +132,3 @@ input SurveyInput {
   questionId: Int!
   answer: String!
 }
-

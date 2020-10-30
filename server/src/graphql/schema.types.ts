@@ -12,6 +12,32 @@ export interface Scalars {
   Float: number
 }
 
+export interface Query {
+  __typename?: 'Query'
+  self?: Maybe<User>
+  surveys: Array<Survey>
+  survey?: Maybe<Survey>
+  artist?: Maybe<Artist>
+  listeningSession?: Maybe<ListeningSession>
+  queue?: Maybe<Queue>
+}
+
+export interface QuerySurveyArgs {
+  surveyId: Scalars['Int']
+}
+
+export interface QueryArtistArgs {
+  name: Scalars['String']
+}
+
+export interface QueryListeningSessionArgs {
+  sessionId: Scalars['Int']
+}
+
+export interface QueryQueueArgs {
+  sessionId: Scalars['Int']
+}
+
 export interface Mutation {
   __typename?: 'Mutation'
   answerSurvey: Scalars['Boolean']
@@ -26,17 +52,6 @@ export interface MutationNextSurveyQuestionArgs {
   surveyId: Scalars['Int']
 }
 
-export interface Query {
-  __typename?: 'Query'
-  self?: Maybe<User>
-  surveys: Array<Survey>
-  survey?: Maybe<Survey>
-}
-
-export interface QuerySurveyArgs {
-  surveyId: Scalars['Int']
-}
-
 export interface Subscription {
   __typename?: 'Subscription'
   surveyUpdates?: Maybe<Survey>
@@ -44,6 +59,61 @@ export interface Subscription {
 
 export interface SubscriptionSurveyUpdatesArgs {
   surveyId: Scalars['Int']
+}
+
+export interface User {
+  __typename?: 'User'
+  id: Scalars['Int']
+  userType: UserType
+  email: Scalars['String']
+  name: Scalars['String']
+}
+
+export interface Song {
+  __typename?: 'Song'
+  id: Scalars['Int']
+  name: Scalars['String']
+  genre: Scalars['String']
+  duration: Scalars['Int']
+  artist: Artist
+}
+
+export interface Artist {
+  __typename?: 'Artist'
+  id: Scalars['Int']
+  name: Scalars['String']
+  origin?: Maybe<Scalars['String']>
+  songs: Array<Maybe<Song>>
+}
+
+export interface ListeningSession {
+  __typename?: 'ListeningSession'
+  id: Scalars['Int']
+  timeCreated: Scalars['Int']
+  owner: PartyRocker
+  partyRockers: Array<PartyRocker>
+}
+
+export interface PartyRocker {
+  __typename?: 'PartyRocker'
+  id: Scalars['Int']
+  name: Scalars['String']
+  spotifyCreds?: Maybe<Scalars['String']>
+  listeningSession?: Maybe<ListeningSession>
+}
+
+export interface Queue {
+  __typename?: 'Queue'
+  id: Scalars['Int']
+  score: Scalars['Int']
+  position: Scalars['Int']
+  song: Song
+  listeningSession: ListeningSession
+}
+
+export enum UserType {
+  Admin = 'ADMIN',
+  User = 'USER',
 }
 
 export interface Survey {
@@ -56,6 +126,15 @@ export interface Survey {
   questions: Array<Maybe<SurveyQuestion>>
 }
 
+export interface SurveyQuestion {
+  __typename?: 'SurveyQuestion'
+  id: Scalars['Int']
+  prompt: Scalars['String']
+  choices?: Maybe<Array<Scalars['String']>>
+  answers: Array<SurveyAnswer>
+  survey: Survey
+}
+
 export interface SurveyAnswer {
   __typename?: 'SurveyAnswer'
   id: Scalars['Int']
@@ -66,28 +145,6 @@ export interface SurveyAnswer {
 export interface SurveyInput {
   questionId: Scalars['Int']
   answer: Scalars['String']
-}
-
-export interface SurveyQuestion {
-  __typename?: 'SurveyQuestion'
-  id: Scalars['Int']
-  prompt: Scalars['String']
-  choices?: Maybe<Array<Scalars['String']>>
-  answers: Array<SurveyAnswer>
-  survey: Survey
-}
-
-export interface User {
-  __typename?: 'User'
-  id: Scalars['Int']
-  userType: UserType
-  email: Scalars['String']
-  name: Scalars['String']
-}
-
-export enum UserType {
-  Admin = 'ADMIN',
-  User = 'USER',
 }
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
@@ -168,32 +225,64 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>
-  User: ResolverTypeWrapper<User>
   Int: ResolverTypeWrapper<Scalars['Int']>
-  UserType: UserType
   String: ResolverTypeWrapper<Scalars['String']>
-  Survey: ResolverTypeWrapper<Survey>
+  Mutation: ResolverTypeWrapper<{}>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+  Subscription: ResolverTypeWrapper<{}>
+  User: ResolverTypeWrapper<User>
+  Song: ResolverTypeWrapper<Song>
+  Artist: ResolverTypeWrapper<Artist>
+  ListeningSession: ResolverTypeWrapper<ListeningSession>
+  PartyRocker: ResolverTypeWrapper<PartyRocker>
+  Queue: ResolverTypeWrapper<Queue>
+  UserType: UserType
+  Survey: ResolverTypeWrapper<Survey>
   SurveyQuestion: ResolverTypeWrapper<SurveyQuestion>
   SurveyAnswer: ResolverTypeWrapper<SurveyAnswer>
-  Mutation: ResolverTypeWrapper<{}>
   SurveyInput: SurveyInput
-  Subscription: ResolverTypeWrapper<{}>
 }
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Query: {}
-  User: User
   Int: Scalars['Int']
   String: Scalars['String']
-  Survey: Survey
+  Mutation: {}
   Boolean: Scalars['Boolean']
+  Subscription: {}
+  User: User
+  Song: Song
+  Artist: Artist
+  ListeningSession: ListeningSession
+  PartyRocker: PartyRocker
+  Queue: Queue
+  Survey: Survey
   SurveyQuestion: SurveyQuestion
   SurveyAnswer: SurveyAnswer
-  Mutation: {}
   SurveyInput: SurveyInput
-  Subscription: {}
+}
+
+export type QueryResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
+> = {
+  self?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
+  surveys?: Resolver<Array<ResolversTypes['Survey']>, ParentType, ContextType>
+  survey?: Resolver<
+    Maybe<ResolversTypes['Survey']>,
+    ParentType,
+    ContextType,
+    RequireFields<QuerySurveyArgs, 'surveyId'>
+  >
+  artist?: Resolver<Maybe<ResolversTypes['Artist']>, ParentType, ContextType, RequireFields<QueryArtistArgs, 'name'>>
+  listeningSession?: Resolver<
+    Maybe<ResolversTypes['ListeningSession']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryListeningSessionArgs, 'sessionId'>
+  >
+  queue?: Resolver<Maybe<ResolversTypes['Queue']>, ParentType, ContextType, RequireFields<QueryQueueArgs, 'sessionId'>>
 }
 
 export type MutationResolvers<
@@ -214,20 +303,6 @@ export type MutationResolvers<
   >
 }
 
-export type QueryResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
-> = {
-  self?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>
-  surveys?: Resolver<Array<ResolversTypes['Survey']>, ParentType, ContextType>
-  survey?: Resolver<
-    Maybe<ResolversTypes['Survey']>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerySurveyArgs, 'surveyId'>
-  >
-}
-
 export type SubscriptionResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']
@@ -239,6 +314,74 @@ export type SubscriptionResolvers<
     ContextType,
     RequireFields<SubscriptionSurveyUpdatesArgs, 'surveyId'>
   >
+}
+
+export type UserResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  userType?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type SongResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Song'] = ResolversParentTypes['Song']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  genre?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  duration?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  artist?: Resolver<ResolversTypes['Artist'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type ArtistResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Artist'] = ResolversParentTypes['Artist']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  origin?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  songs?: Resolver<Array<Maybe<ResolversTypes['Song']>>, ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type ListeningSessionResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['ListeningSession'] = ResolversParentTypes['ListeningSession']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  timeCreated?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  owner?: Resolver<ResolversTypes['PartyRocker'], ParentType, ContextType>
+  partyRockers?: Resolver<Array<ResolversTypes['PartyRocker']>, ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type PartyRockerResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['PartyRocker'] = ResolversParentTypes['PartyRocker']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  spotifyCreds?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  listeningSession?: Resolver<Maybe<ResolversTypes['ListeningSession']>, ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type QueueResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['Queue'] = ResolversParentTypes['Queue']
+> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  score?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  position?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  song?: Resolver<ResolversTypes['Song'], ParentType, ContextType>
+  listeningSession?: Resolver<ResolversTypes['ListeningSession'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type SurveyResolvers<
@@ -254,16 +397,6 @@ export type SurveyResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
-export type SurveyAnswerResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['SurveyAnswer'] = ResolversParentTypes['SurveyAnswer']
-> = {
-  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  answer?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  question?: Resolver<ResolversTypes['SurveyQuestion'], ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType>
-}
-
 export type SurveyQuestionResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['SurveyQuestion'] = ResolversParentTypes['SurveyQuestion']
@@ -276,25 +409,29 @@ export type SurveyQuestionResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
-export type UserResolvers<
+export type SurveyAnswerResolvers<
   ContextType = any,
-  ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']
+  ParentType extends ResolversParentTypes['SurveyAnswer'] = ResolversParentTypes['SurveyAnswer']
 > = {
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  userType?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>
-  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  answer?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  question?: Resolver<ResolversTypes['SurveyQuestion'], ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type Resolvers<ContextType = any> = {
-  Mutation?: MutationResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
+  Mutation?: MutationResolvers<ContextType>
   Subscription?: SubscriptionResolvers<ContextType>
-  Survey?: SurveyResolvers<ContextType>
-  SurveyAnswer?: SurveyAnswerResolvers<ContextType>
-  SurveyQuestion?: SurveyQuestionResolvers<ContextType>
   User?: UserResolvers<ContextType>
+  Song?: SongResolvers<ContextType>
+  Artist?: ArtistResolvers<ContextType>
+  ListeningSession?: ListeningSessionResolvers<ContextType>
+  PartyRocker?: PartyRockerResolvers<ContextType>
+  Queue?: QueueResolvers<ContextType>
+  Survey?: SurveyResolvers<ContextType>
+  SurveyQuestion?: SurveyQuestionResolvers<ContextType>
+  SurveyAnswer?: SurveyAnswerResolvers<ContextType>
 }
 
 /**
