@@ -21,6 +21,8 @@ type Query {
   surveys: [Survey!]!
   survey(surveyId: Int!): Survey
   artist(name: String!): Artist
+  listeningSession(sessionId: Int!): ListeningSession
+  queue(sessionId: Int!): Queue
 }
 
 type Mutation {
@@ -55,6 +57,29 @@ type Artist {
   name: String!
   origin: String
   songs: [Song]!
+}
+
+#time created is time since epoch
+type ListeningSession {
+  id: Int!
+  timeCreated: Int!
+  owner: PartyRocker!
+  partyRockers: [PartyRocker!]!
+}
+
+type PartyRocker {
+  id: Int!
+  name: String!
+  spotifyCreds: String
+  listeningSession: ListeningSession
+}
+
+type Queue {
+  id: Int!
+  score: Int!
+  position: Int!
+  song: Song!
+  listeningSession: ListeningSession!
 }
 
 enum UserType {
