@@ -15,12 +15,10 @@ export class Song extends BaseEntity {
   @Column()
   genre: string
 
-  // @Column('simple-array', { nullable: true })
-  // choices: string[]
-
   // @OneToMany(type => SurveyAnswer, answer => answer.question, { eager: true })
   // answers: SurveyAnswer[]
 
   @ManyToOne(type => Artist, artist => artist.songs)
   artist: Artist
+
 }
