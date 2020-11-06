@@ -19,7 +19,7 @@ const title = {
 
 const otherTabs = [
   {
-    name: 'lectures',
+    name: 'Sessions',
     path: getPath(Route.LECTURES),
   },
   {
