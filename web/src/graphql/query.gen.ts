@@ -24,6 +24,162 @@ export interface FetchUserContext {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: FetchListeningSession
+// ====================================================
+
+export interface FetchListeningSession_listeningSession_owner_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface FetchListeningSession_listeningSession_owner {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: FetchListeningSession_listeningSession_owner_listeningSession | null;
+}
+
+export interface FetchListeningSession_listeningSession_partyRockers_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface FetchListeningSession_listeningSession_partyRockers {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: FetchListeningSession_listeningSession_partyRockers_listeningSession | null;
+}
+
+export interface FetchListeningSession_listeningSession_queue_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface FetchListeningSession_listeningSession_queue {
+  __typename: "Queue";
+  id: number;
+  score: number;
+  position: number;
+  listeningSession: FetchListeningSession_listeningSession_queue_listeningSession;
+}
+
+export interface FetchListeningSession_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+  timeCreated: number;
+  owner: FetchListeningSession_listeningSession_owner;
+  partyRockers: FetchListeningSession_listeningSession_partyRockers[];
+  queue: FetchListeningSession_listeningSession_queue[] | null;
+}
+
+export interface FetchListeningSession {
+  listeningSession: FetchListeningSession_listeningSession | null;
+}
+
+export interface FetchListeningSessionVariables {
+  sessionId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: FetchPartyRocker
+// ====================================================
+
+export interface FetchPartyRocker_partyRockers_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface FetchPartyRocker_partyRockers {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: FetchPartyRocker_partyRockers_listeningSession | null;
+}
+
+export interface FetchPartyRocker {
+  partyRockers: FetchPartyRocker_partyRockers[];
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: FetchQueue
+// ====================================================
+
+export interface FetchQueue_listeningSession_owner_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface FetchQueue_listeningSession_owner {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: FetchQueue_listeningSession_owner_listeningSession | null;
+}
+
+export interface FetchQueue_listeningSession_partyRockers_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface FetchQueue_listeningSession_partyRockers {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: FetchQueue_listeningSession_partyRockers_listeningSession | null;
+}
+
+export interface FetchQueue_listeningSession_queue_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface FetchQueue_listeningSession_queue {
+  __typename: "Queue";
+  id: number;
+  score: number;
+  position: number;
+  listeningSession: FetchQueue_listeningSession_queue_listeningSession;
+}
+
+export interface FetchQueue_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+  timeCreated: number;
+  owner: FetchQueue_listeningSession_owner;
+  partyRockers: FetchQueue_listeningSession_partyRockers[];
+  queue: FetchQueue_listeningSession_queue[] | null;
+}
+
+export interface FetchQueue {
+  listeningSession: FetchQueue_listeningSession | null;
+}
+
+export interface FetchQueueVariables {
+  sessionId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: FetchSurveys
 // ====================================================
 
@@ -185,6 +341,107 @@ export interface NextSurveyQuestion {
 
 export interface NextSurveyQuestionVariables {
   surveyId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: ListeningSession
+// ====================================================
+
+export interface ListeningSession_owner_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface ListeningSession_owner {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: ListeningSession_owner_listeningSession | null;
+}
+
+export interface ListeningSession_partyRockers_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface ListeningSession_partyRockers {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: ListeningSession_partyRockers_listeningSession | null;
+}
+
+export interface ListeningSession_queue_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface ListeningSession_queue {
+  __typename: "Queue";
+  id: number;
+  score: number;
+  position: number;
+  listeningSession: ListeningSession_queue_listeningSession;
+}
+
+export interface ListeningSession {
+  __typename: "ListeningSession";
+  id: number;
+  timeCreated: number;
+  owner: ListeningSession_owner;
+  partyRockers: ListeningSession_partyRockers[];
+  queue: ListeningSession_queue[] | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: PartyRocker
+// ====================================================
+
+export interface PartyRocker_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface PartyRocker {
+  __typename: "PartyRocker";
+  id: number;
+  name: string;
+  spotifyCreds: string | null;
+  listeningSession: PartyRocker_listeningSession | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: Queue
+// ====================================================
+
+export interface Queue_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface Queue {
+  __typename: "Queue";
+  id: number;
+  score: number;
+  position: number;
+  listeningSession: Queue_listeningSession;
 }
 
 /* tslint:disable */

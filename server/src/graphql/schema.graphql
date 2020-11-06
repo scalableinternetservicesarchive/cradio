@@ -22,7 +22,10 @@ type Query {
   survey(surveyId: Int!): Survey
   artist(name: String!): Artist
   listeningSession(sessionId: Int!): ListeningSession
-  queue(sessionId: Int!): Queue
+  sessionQueue(sessionId: Int!): [Queue!]! #return list of all songs in session queue
+  partyRockers: [PartyRocker!]!
+  song(songName: String!): [Song!]!
+  songs: [Song!]!
 }
 
 type Mutation {
@@ -31,6 +34,9 @@ type Mutation {
 
   # Moves the survey to the next question (or starts it if it hasn't started). ADMIN only.
   nextSurveyQuestion(surveyId: Int!): Survey
+
+  # #add song to master queue with currrent session id
+  # addToQueue()
 }
 
 type Subscription {
@@ -65,6 +71,7 @@ type ListeningSession {
   timeCreated: Int!
   owner: PartyRocker!
   partyRockers: [PartyRocker!]!
+  queue: [Queue!]
 }
 
 type PartyRocker {
@@ -72,6 +79,7 @@ type PartyRocker {
   name: String!
   spotifyCreds: String
   listeningSession: ListeningSession
+  foobazbar: String
 }
 
 type Queue {
@@ -132,3 +140,8 @@ input SurveyInput {
   questionId: Int!
   answer: String!
 }
+
+# input QueueInfo {
+#   song: Song!
+#   listeningSession: ListeningSession!
+# }
