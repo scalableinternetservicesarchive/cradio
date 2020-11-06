@@ -25,6 +25,7 @@ type Query {
   sessionQueue(sessionId: Int!): [Queue!]! #return list of all songs in session queue
   partyRockers: [PartyRocker!]!
   song(songName: String!): [Song!]!
+  songs: [Song!]!
 }
 
 type Mutation {

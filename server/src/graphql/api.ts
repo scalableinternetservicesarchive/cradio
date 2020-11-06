@@ -34,7 +34,8 @@ export const graphqlRoot: Resolvers<Context> = {
     sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { sessionId: sessionId } })) || null,
     surveys: () => Survey.find(),
     partyRockers: async () => await PartyRocker.find(),
-    song: async (_, { songName }) => (await Song.find({ where: { name: songName } }))
+    songs: async () => await Song.find({relations: ['artist']}),
+    song: async (_, { songName }) => (await Song.find({ where: { name: songName }, relations: ['artist'] }))
   },
   Mutation: {
     answerSurvey: async (_, { input }, ctx) => {

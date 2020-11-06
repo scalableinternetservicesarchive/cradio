@@ -5,8 +5,6 @@ import { Fragment, useContext, useEffect, useState } from 'react'
 import { strutil } from '../../../../common/src/util'
 import { getApolloClient } from '../../graphql/apolloClient'
 import {
-  FetchQueue,
-  FetchQueueVariables,
   FetchSurvey,
   FetchSurveys,
   FetchSurveyVariables,
@@ -25,7 +23,6 @@ import { link } from '../nav/Link'
 import { getSurveyPath } from '../nav/route'
 import { handleError } from '../toast/error'
 import { toast } from '../toast/toast'
-import { fetchQueue } from './fetchQueue'
 import { fetchSurvey, fetchSurveys, subscribeSurveys } from './fetchSurveys'
 import { answerSurveyQuestion, nextSurveyQuestion } from './mutateSurveys'
 
@@ -66,9 +63,9 @@ export function Survey({ surveyId }: { surveyId: number }) {
     variables: { surveyId },
   })
 
-  const result= useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
-    variables: { sessionId: 305 },
-  })
+  // const result= useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
+  //   variables: { sessionId: 305 },
+  // })
 
   const [currQuestion, setCurrQuestion] = useState(data?.survey?.currentQuestion)
   useEffect(() => {

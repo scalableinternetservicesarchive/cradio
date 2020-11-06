@@ -21,7 +21,8 @@ export interface Query {
   listeningSession?: Maybe<ListeningSession>
   sessionQueue: Array<Queue>
   partyRockers: Array<PartyRocker>
-  song: Array<Maybe<Song>>
+  song: Array<Song>
+  songs: Array<Song>
 }
 
 export interface QuerySurveyArgs {
@@ -297,12 +298,8 @@ export type QueryResolvers<
     RequireFields<QuerySessionQueueArgs, 'sessionId'>
   >
   partyRockers?: Resolver<Array<ResolversTypes['PartyRocker']>, ParentType, ContextType>
-  song?: Resolver<
-    Array<Maybe<ResolversTypes['Song']>>,
-    ParentType,
-    ContextType,
-    RequireFields<QuerySongArgs, 'songName'>
-  >
+  song?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType, RequireFields<QuerySongArgs, 'songName'>>
+  songs?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType>
 }
 
 export type MutationResolvers<
