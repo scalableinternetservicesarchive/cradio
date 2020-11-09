@@ -3,6 +3,9 @@ import { PubSub } from 'graphql-yoga'
 import path from 'path'
 import { check } from '../../../common/src/util'
 import { ListeningSession } from '../entities/ListeningSession'
+import { PartyRocker } from '../entities/PartyRocker'
+import { Queue } from '../entities/Queue'
+import { Song } from '../entities/Song'
 import { Survey } from '../entities/Survey'
 import { SurveyAnswer } from '../entities/SurveyAnswer'
 import { SurveyQuestion } from '../entities/SurveyQuestion'
@@ -27,8 +30,12 @@ export const graphqlRoot: Resolvers<Context> = {
   Query: {
     self: (_, args, ctx) => ctx.user,
     survey: async (_, { surveyId }) => (await Survey.findOne({ where: { id: surveyId } })) || null,
-    listeningSession: async (_, { sessionId }) => (await ListeningSession.findOne({ where: { id: sessionId } })) || null,
+    listeningSession: async (_, { sessionId }) => (await ListeningSession.findOne({ where: { id: sessionId }, relations: ['queue'] })) || null,
+    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { sessionId: sessionId } })) || null,
     surveys: () => Survey.find(),
+    partyRockers: async () => await PartyRocker.find(),
+    songs: async () => await Song.find({relations: ['artist']}),
+    song: async (_, { songName }) => (await Song.find({ where: { name: songName }, relations: ['artist'] }))
   },
   Mutation: {
     answerSurvey: async (_, { input }, ctx) => {
@@ -59,5 +66,5 @@ export const graphqlRoot: Resolvers<Context> = {
       subscribe: (_, { surveyId }, context) => context.pubsub.asyncIterator('SURVEY_UPDATE_' + surveyId),
       resolve: (payload: any) => payload,
     },
-  },
+  }
 }

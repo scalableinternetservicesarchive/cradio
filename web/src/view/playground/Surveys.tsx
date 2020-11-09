@@ -11,7 +11,7 @@ import {
   FetchSurvey_survey_currentQuestion,
   FetchSurvey_survey_currentQuestion_answers,
   SurveySubscription,
-  SurveySubscriptionVariables,
+  SurveySubscriptionVariables
 } from '../../graphql/query.gen'
 import { Button } from '../../style/button'
 import { H1, H2 } from '../../style/header'
@@ -62,6 +62,10 @@ export function Survey({ surveyId }: { surveyId: number }) {
   const { loading, data, refetch } = useQuery<FetchSurvey, FetchSurveyVariables>(fetchSurvey, {
     variables: { surveyId },
   })
+
+  // const result= useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
+  //   variables: { sessionId: 305 },
+  // })
 
   const [currQuestion, setCurrQuestion] = useState(data?.survey?.currentQuestion)
   useEffect(() => {
