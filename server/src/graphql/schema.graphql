@@ -35,8 +35,12 @@ type Mutation {
   # Moves the survey to the next question (or starts it if it hasn't started). ADMIN only.
   nextSurveyQuestion(surveyId: Int!): Survey
 
-  # #add song to master queue with currrent session id
-  # addToQueue()
+  #add song to master queue with currrent session id
+  addToQueue(input: QueueInfo!): Boolean!
+
+  createPartyRocker(input: PartyRockerInfo!): PartyRocker!
+
+  createListeningSession(partyRockerId: Int!): ListeningSession!
 }
 
 type Subscription {
@@ -65,10 +69,11 @@ type Artist {
   songs: [Song]!
 }
 
-#time created is time since epoch
+#time created is time in seconds since epoch
 type ListeningSession {
   id: Int!
   timeCreated: Int!
+  queueLength: Int!
   owner: PartyRocker!
   partyRockers: [PartyRocker!]!
   queue: [Queue!]
@@ -79,7 +84,6 @@ type PartyRocker {
   name: String!
   spotifyCreds: String
   listeningSession: ListeningSession
-  foobazbar: String
 }
 
 type Queue {
@@ -141,7 +145,11 @@ input SurveyInput {
   answer: String!
 }
 
-# input QueueInfo {
-#   song: Song!
-#   listeningSession: ListeningSession!
-# }
+input QueueInfo {
+  songId: Int!
+  listeningSessionId: Int!
+}
+
+input PartyRockerInfo {
+  name: String!
+}

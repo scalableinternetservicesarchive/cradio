@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
 import path from 'path'
+import { getManager } from "typeorm"
 import { check } from '../../../common/src/util'
 import { ListeningSession } from '../entities/ListeningSession'
 import { PartyRocker } from '../entities/PartyRocker'
@@ -60,6 +61,57 @@ export const graphqlRoot: Resolvers<Context> = {
       ctx.pubsub.publish('SURVEY_UPDATE_' + surveyId, survey)
       return survey
     },
+    addToQueue: async (_, { input }, ctx) => {
+      const { songId, listeningSessionId } = input
+      const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
+      const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }}))
+
+      const queueItem = new Queue()
+      queueItem.score = 0
+      queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
+      queueItem.song = song
+      queueItem.listeningSession = listeningSession
+      await queueItem.save()
+
+      //incrementing length of listeningSession.queueLength
+      const entityManager = getManager();
+      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
+
+      return true
+    },
+    createPartyRocker: async (_, { input }, ctx) => {
+      const { name } = input
+
+      const partyRocker = new PartyRocker()
+      partyRocker.name = name
+      await partyRocker.save()
+
+      return partyRocker
+    },
+    createListeningSession: async (_, { partyRockerId }, ctx) => {
+      const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
+      console.log(owner)
+
+      const listeningSession = new ListeningSession()
+
+      listeningSession.owner = owner
+      listeningSession.timeCreated = Math.round(Date.now() / 1000)
+      listeningSession.queueLength = 0
+      listeningSession.partyRockers = []
+      listeningSession.partyRockers.push(owner)
+      listeningSession.queue = []
+
+      console.log("anything: the prequel")
+
+      await listeningSession.save()
+      console.log("anything")
+
+      owner.listeningSession = listeningSession
+      await owner.save()
+      console.log("anything too: electric boogaloo")
+
+      return listeningSession
+    }
   },
   Subscription: {
     surveyUpdates: {
