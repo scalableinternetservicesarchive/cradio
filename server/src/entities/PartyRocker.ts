@@ -20,5 +20,4 @@ export class PartyRocker extends BaseEntity {
   @ManyToOne(type => ListeningSession, listeningSession => listeningSession.partyRockers)
   listeningSession: ListeningSession
 
-
 }
