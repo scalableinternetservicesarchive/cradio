@@ -180,6 +180,64 @@ export interface FetchQueueVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: FetchSongs
+// ====================================================
+
+export interface FetchSongs_songs_artist {
+  __typename: "Artist";
+  name: string;
+}
+
+export interface FetchSongs_songs {
+  __typename: "Song";
+  id: number;
+  name: string;
+  genre: string;
+  duration: number;
+  artist: FetchSongs_songs_artist;
+}
+
+export interface FetchSongs {
+  songs: FetchSongs_songs[];
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: FetchSong
+// ====================================================
+
+export interface FetchSong_song_artist {
+  __typename: "Artist";
+  name: string;
+}
+
+export interface FetchSong_song {
+  __typename: "Song";
+  id: number;
+  name: string;
+  genre: string;
+  duration: number;
+  artist: FetchSong_song_artist;
+}
+
+export interface FetchSong {
+  song: FetchSong_song[];
+}
+
+export interface FetchSongVariables {
+  songName: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: FetchSurveys
 // ====================================================
 
@@ -442,6 +500,29 @@ export interface Queue {
   score: number;
   position: number;
   listeningSession: Queue_listeningSession;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL fragment: Song
+// ====================================================
+
+export interface Song_artist {
+  __typename: "Artist";
+  name: string;
+}
+
+export interface Song {
+  __typename: "Song";
+  id: number;
+  name: string;
+  genre: string;
+  duration: number;
+  artist: Song_artist;
 }
 
 /* tslint:disable */
