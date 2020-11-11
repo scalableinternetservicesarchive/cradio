@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ListeningSession } from './ListeningSession'
 import { Song } from './Song'
 
@@ -13,7 +13,8 @@ export class Queue extends BaseEntity {
   @Column()
   position: number
 
-  @ManyToOne(type => Song, song => song.id)
+  @ManyToOne(type => Song, song => song.id, {eager:true})
+  @JoinColumn()
   song: Song
 
   // @Column('simple-array', { nullable: true })
