@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { PartyRocker } from './PartyRocker'
 import { Queue } from './Queue'
 
@@ -15,6 +15,7 @@ export class ListeningSession extends BaseEntity {
   queueLength: number
 
   @OneToOne(type => PartyRocker, {cascade:true})
+  @JoinColumn()
   owner: PartyRocker
 
   @OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession, {cascade:true})
