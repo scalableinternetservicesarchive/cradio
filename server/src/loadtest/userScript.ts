@@ -6,9 +6,24 @@
 export type UserScript = () => Promise<any>
 
 export async function userScript() {
-  await fetch('https://cradio.cloudcity.computer/')
-  await fetch('https://cradio.cloudcity.computer/')
-  await fetch('https://cradio.cloudcity.computer/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
+  await fetch('http://localhost:3000/app/index/')
 }
 
 // set this is you require authenticated requests
