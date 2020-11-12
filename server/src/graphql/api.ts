@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
 import path from 'path'
-import { getManager } from "typeorm"
+import { getManager } from 'typeorm'
 import { check } from '../../../common/src/util'
 import { ListeningSession } from '../entities/ListeningSession'
 import { PartyRocker } from '../entities/PartyRocker'
@@ -31,8 +31,8 @@ export const graphqlRoot: Resolvers<Context> = {
   Query: {
     self: (_, args, ctx) => ctx.user,
     survey: async (_, { surveyId }) => (await Survey.findOne({ where: { id: surveyId } })) || null,
-    listeningSession: async (_, { sessionId }) => (await ListeningSession.findOne({ where: { id: sessionId }, relations: ['queue'] })) || null,
-    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { sessionId: sessionId } })) || null,
+    listeningSession: async (_, { sessionId }) => (await ListeningSession.findOne({ where: { id: sessionId }, relations: ['queue', 'owner', 'partyRockers'] })) || null,
+    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song']})) || null, //do we want this null???
     surveys: () => Survey.find(),
     partyRockers: async () => await PartyRocker.find(),
     songs: async () => await Song.find({relations: ['artist']}),
@@ -64,7 +64,10 @@ export const graphqlRoot: Resolvers<Context> = {
     addToQueue: async (_, { input }, ctx) => {
       const { songId, listeningSessionId } = input
       const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
-      const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }}))
+      const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song']}))
+
+
+
 
       const queueItem = new Queue()
       queueItem.score = 0
@@ -73,9 +76,15 @@ export const graphqlRoot: Resolvers<Context> = {
       queueItem.listeningSession = listeningSession
       await queueItem.save()
 
+      //adding the queue item to the listneing session
+      console.log("listening session queue", listeningSession.queue)
+      listeningSession.queue.push(queueItem)
+      listeningSession.save()
+
       //incrementing length of listeningSession.queueLength
       const entityManager = getManager();
       check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
+
 
       return true
     },
@@ -101,14 +110,14 @@ export const graphqlRoot: Resolvers<Context> = {
       listeningSession.partyRockers.push(owner)
       listeningSession.queue = []
 
-      console.log("anything: the prequel")
+
 
       await listeningSession.save()
-      console.log("anything")
+
 
       owner.listeningSession = listeningSession
       await owner.save()
-      console.log("anything too: electric boogaloo")
+
 
       return listeningSession
     }
