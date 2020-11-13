@@ -396,6 +396,23 @@ export interface CreatePartyRockerVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: AddToQueue
+// ====================================================
+
+export interface AddToQueue {
+  addToQueue: boolean;
+}
+
+export interface AddToQueueVariables {
+  input: QueueInfo;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL mutation operation: AnswerSurveyQuestion
 // ====================================================
 
@@ -639,6 +656,11 @@ export enum UserType {
 
 export interface PartyRockerInfo {
   name: string;
+}
+
+export interface QueueInfo {
+  songId: number;
+  listeningSessionId: number;
 }
 
 export interface SurveyInput {
