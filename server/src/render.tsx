@@ -44,52 +44,62 @@ export function renderApp(req: Request, res: Response) {
   )
 
   getDataFromTree(app)
-    .then(() => {
-      const apolloState = apolloClient.extract()
-      const body = ReactDOMServer.renderToString(app)
-      const styles = engine.getCss()
-      const html = ReactDOMServer.renderToString(
-        <html>
-          <head>
-            <meta charSet="utf8" />
-            <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <link rel="shortcut icon" href={`/app/assets/favicon${Config.isProd ? '' : '-dev'}.ico`} />
-            <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
-            <link rel="stylesheet" href="/app/css/app.css" />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.app = {
-                serverRendered: true,
-                wsUrl: "${Config.wsUrl}",
-                commitHash: "${'hash'}",
-                isProd: ${Config.isProd},
-                apolloState: ${apolloState ? JSON.stringify(apolloState) : 'undefined'}
-              }`,
-              }}
-            />
-            <style
-              dangerouslySetInnerHTML={{
-                __html: styles,
-              }}
-            />
-          </head>
-          <body>
-            <div id="app" dangerouslySetInnerHTML={{ __html: body }} />
-            <script src="/app/js/bundle.js"></script>
-          </body>
-        </html>
-      )
+      .then(() => {
+        const apolloState = apolloClient.extract()
+        const body = ReactDOMServer.renderToString(app)
+        const styles = engine.getCss()
+        const html = ReactDOMServer.renderToString(
+          <html>
+            <head>
+              <meta charSet="utf8" />
+              <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <link rel="shortcut icon" href={`/app/assets/favicon${Config.isProd ? '' : '-dev'}.ico`} />
+              <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
+              <link rel="stylesheet" href="/app/css/app.css" />
+              <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossOrigin="anonymous" />
+      <script src="https://unpkg.com/react/umd/react.production.min.js" crossOrigin = 'true'></script>
 
-      res.status(200).contentType('text/html').send(html)
-    })
-    .catch(err => {
-      if (isRedirect(err)) {
-        return res.redirect(err.uri)
-      } else {
-        return res.status(500).send(err.stack || err.message)
-      }
-    })
+  <script
+    src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"
+    crossOrigin = 'true'></script>
+
+  <script
+    src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js"
+    crossOrigin = 'true'></script>
+              <script
+                dangerouslySetInnerHTML={{
+                  __html: `window.app = {
+                  serverRendered: true,
+                  wsUrl: "${Config.wsUrl}",
+                  commitHash: "${'hash'}",
+                  isProd: ${Config.isProd},
+                  apolloState: ${apolloState ? JSON.stringify(apolloState) : 'undefined'}
+                }`,
+                }}
+              />
+              <style
+                dangerouslySetInnerHTML={{
+                  __html: styles,
+                }}
+              />
+            </head>
+            <body>
+              <div id="app" dangerouslySetInnerHTML={{ __html: body }} />
+              <script src="/app/js/bundle.js"></script>
+            </body>
+          </html>
+        )
+
+        res.status(200).contentType('text/html').send(html)
+      })
+      .catch(err => {
+        if (isRedirect(err)) {
+          return res.redirect(err.uri)
+        } else {
+          return res.status(500).send(err.stack || err.message)
+        }
+      })
 }
 
 export const staticHtml = `<html lang="en">
@@ -100,6 +110,7 @@ export const staticHtml = `<html lang="en">
     <link rel="shortcut icon" href="/app/assets/favicon${Config.isProd ? '' : '-dev'}.ico">
     <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
     <link rel="stylesheet" href="/app/css/app.css" >
+    <link rel="stylesheet" href="https://"https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"/>
     <script>
       window.app = {
         serverRendered: false,
