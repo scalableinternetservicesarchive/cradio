@@ -1,13 +1,16 @@
 import { gql } from '@apollo/client'
-import { fragmentListeningSession } from './fetchListeningSession'
-import { fragmentPartyRocker } from './fetchPartyRocker'
 
 export const fragmentQueue = gql`
   fragment Queue on Queue {
     id
     score
     position
-
+    song{
+      name
+      genre
+      duration
+      artist { name }
+    }
     listeningSession {
       id
     }
@@ -18,12 +21,11 @@ export const fragmentQueue = gql`
 
 export const fetchQueue = gql`
   query FetchQueue($sessionId: Int!) {
-    listeningSession(sessionId: $sessionId ) {
-      ...ListeningSession
+  sessionQueue(sessionId: $sessionId ) {
+    ...Queue
     }
   }
-  ${fragmentListeningSession}
-  ${fragmentPartyRocker}
+  ${fragmentQueue}
 `
 
 // export const subscribeSurveys = gql`
