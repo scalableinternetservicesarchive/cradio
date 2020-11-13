@@ -3,8 +3,8 @@ import * as React from 'react'
 import { Colors } from '../../../../common/src/colors'
 import { H1, H3 } from '../../style/header'
 import { style } from '../../style/styled'
+import { Login } from '../auth/Login'
 import { AppRouteParams } from '../nav/route'
-import { Sessions } from '../playground/Sessions'
 import { Page } from './Page'
 
 interface HomePageProps extends RouteComponentProps, AppRouteParams {}
@@ -18,7 +18,7 @@ export function HomePage(props: HomePageProps) {
         <H3>UCLA, Fall 2020</H3>
       </Hero>
       <img src={"/app/assets/cradio.png"}/>
-      <Sessions />
+      <Login />
     </Page>
   )
 }
