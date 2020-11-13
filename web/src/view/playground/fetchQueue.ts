@@ -9,7 +9,7 @@ export const fragmentQueue = gql`
       name
       genre
       duration
-      artist
+      artist { name }
     }
     listeningSession {
       id

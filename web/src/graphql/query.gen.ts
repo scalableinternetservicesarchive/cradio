@@ -53,6 +53,19 @@ export interface FetchListeningSession_listeningSession_partyRockers {
   listeningSession: FetchListeningSession_listeningSession_partyRockers_listeningSession | null;
 }
 
+export interface FetchListeningSession_listeningSession_queue_song_artist {
+  __typename: "Artist";
+  name: string;
+}
+
+export interface FetchListeningSession_listeningSession_queue_song {
+  __typename: "Song";
+  name: string;
+  genre: string;
+  duration: number;
+  artist: FetchListeningSession_listeningSession_queue_song_artist;
+}
+
 export interface FetchListeningSession_listeningSession_queue_listeningSession {
   __typename: "ListeningSession";
   id: number;
@@ -63,6 +76,7 @@ export interface FetchListeningSession_listeningSession_queue {
   id: number;
   score: number;
   position: number;
+  song: FetchListeningSession_listeningSession_queue_song;
   listeningSession: FetchListeningSession_listeningSession_queue_listeningSession;
 }
 
@@ -118,56 +132,35 @@ export interface FetchPartyRocker {
 // GraphQL query operation: FetchQueue
 // ====================================================
 
-export interface FetchQueue_listeningSession_owner_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-}
-
-export interface FetchQueue_listeningSession_owner {
-  __typename: "PartyRocker";
-  id: number;
+export interface FetchQueue_sessionQueue_song_artist {
+  __typename: "Artist";
   name: string;
-  spotifyCreds: string | null;
-  listeningSession: FetchQueue_listeningSession_owner_listeningSession | null;
 }
 
-export interface FetchQueue_listeningSession_partyRockers_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-}
-
-export interface FetchQueue_listeningSession_partyRockers {
-  __typename: "PartyRocker";
-  id: number;
+export interface FetchQueue_sessionQueue_song {
+  __typename: "Song";
   name: string;
-  spotifyCreds: string | null;
-  listeningSession: FetchQueue_listeningSession_partyRockers_listeningSession | null;
+  genre: string;
+  duration: number;
+  artist: FetchQueue_sessionQueue_song_artist;
 }
 
-export interface FetchQueue_listeningSession_queue_listeningSession {
+export interface FetchQueue_sessionQueue_listeningSession {
   __typename: "ListeningSession";
   id: number;
 }
 
-export interface FetchQueue_listeningSession_queue {
+export interface FetchQueue_sessionQueue {
   __typename: "Queue";
   id: number;
   score: number;
   position: number;
-  listeningSession: FetchQueue_listeningSession_queue_listeningSession;
-}
-
-export interface FetchQueue_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-  timeCreated: number;
-  owner: FetchQueue_listeningSession_owner;
-  partyRockers: FetchQueue_listeningSession_partyRockers[];
-  queue: FetchQueue_listeningSession_queue[] | null;
+  song: FetchQueue_sessionQueue_song;
+  listeningSession: FetchQueue_sessionQueue_listeningSession;
 }
 
 export interface FetchQueue {
-  listeningSession: FetchQueue_listeningSession | null;
+  sessionQueue: FetchQueue_sessionQueue[];
 }
 
 export interface FetchQueueVariables {
@@ -498,6 +491,19 @@ export interface ListeningSession_partyRockers {
   listeningSession: ListeningSession_partyRockers_listeningSession | null;
 }
 
+export interface ListeningSession_queue_song_artist {
+  __typename: "Artist";
+  name: string;
+}
+
+export interface ListeningSession_queue_song {
+  __typename: "Song";
+  name: string;
+  genre: string;
+  duration: number;
+  artist: ListeningSession_queue_song_artist;
+}
+
 export interface ListeningSession_queue_listeningSession {
   __typename: "ListeningSession";
   id: number;
@@ -508,6 +514,7 @@ export interface ListeningSession_queue {
   id: number;
   score: number;
   position: number;
+  song: ListeningSession_queue_song;
   listeningSession: ListeningSession_queue_listeningSession;
 }
 
@@ -551,6 +558,19 @@ export interface PartyRocker {
 // GraphQL fragment: Queue
 // ====================================================
 
+export interface Queue_song_artist {
+  __typename: "Artist";
+  name: string;
+}
+
+export interface Queue_song {
+  __typename: "Song";
+  name: string;
+  genre: string;
+  duration: number;
+  artist: Queue_song_artist;
+}
+
 export interface Queue_listeningSession {
   __typename: "ListeningSession";
   id: number;
@@ -561,6 +581,7 @@ export interface Queue {
   id: number;
   score: number;
   position: number;
+  song: Queue_song;
   listeningSession: Queue_listeningSession;
 }
 
