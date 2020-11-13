@@ -19,7 +19,10 @@ export interface Query {
   survey?: Maybe<Survey>
   artist?: Maybe<Artist>
   listeningSession?: Maybe<ListeningSession>
-  queue?: Maybe<Queue>
+  sessionQueue: Array<Queue>
+  partyRockers: Array<PartyRocker>
+  song: Array<Song>
+  songs: Array<Song>
 }
 
 export interface QuerySurveyArgs {
@@ -34,14 +37,21 @@ export interface QueryListeningSessionArgs {
   sessionId: Scalars['Int']
 }
 
-export interface QueryQueueArgs {
+export interface QuerySessionQueueArgs {
   sessionId: Scalars['Int']
+}
+
+export interface QuerySongArgs {
+  songName: Scalars['String']
 }
 
 export interface Mutation {
   __typename?: 'Mutation'
   answerSurvey: Scalars['Boolean']
   nextSurveyQuestion?: Maybe<Survey>
+  addToQueue: Scalars['Boolean']
+  createPartyRocker: PartyRocker
+  createListeningSession: ListeningSession
 }
 
 export interface MutationAnswerSurveyArgs {
@@ -50,6 +60,18 @@ export interface MutationAnswerSurveyArgs {
 
 export interface MutationNextSurveyQuestionArgs {
   surveyId: Scalars['Int']
+}
+
+export interface MutationAddToQueueArgs {
+  input: QueueInfo
+}
+
+export interface MutationCreatePartyRockerArgs {
+  input: PartyRockerInfo
+}
+
+export interface MutationCreateListeningSessionArgs {
+  partyRockerId: Scalars['Int']
 }
 
 export interface Subscription {
@@ -90,8 +112,10 @@ export interface ListeningSession {
   __typename?: 'ListeningSession'
   id: Scalars['Int']
   timeCreated: Scalars['Int']
+  queueLength: Scalars['Int']
   owner: PartyRocker
   partyRockers: Array<PartyRocker>
+  queue?: Maybe<Array<Queue>>
 }
 
 export interface PartyRocker {
@@ -145,6 +169,15 @@ export interface SurveyAnswer {
 export interface SurveyInput {
   questionId: Scalars['Int']
   answer: Scalars['String']
+}
+
+export interface QueueInfo {
+  songId: Scalars['Int']
+  listeningSessionId: Scalars['Int']
+}
+
+export interface PartyRockerInfo {
+  name: Scalars['String']
 }
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
@@ -241,6 +274,8 @@ export type ResolversTypes = {
   SurveyQuestion: ResolverTypeWrapper<SurveyQuestion>
   SurveyAnswer: ResolverTypeWrapper<SurveyAnswer>
   SurveyInput: SurveyInput
+  QueueInfo: QueueInfo
+  PartyRockerInfo: PartyRockerInfo
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -261,6 +296,8 @@ export type ResolversParentTypes = {
   SurveyQuestion: SurveyQuestion
   SurveyAnswer: SurveyAnswer
   SurveyInput: SurveyInput
+  QueueInfo: QueueInfo
+  PartyRockerInfo: PartyRockerInfo
 }
 
 export type QueryResolvers<
@@ -282,7 +319,15 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryListeningSessionArgs, 'sessionId'>
   >
-  queue?: Resolver<Maybe<ResolversTypes['Queue']>, ParentType, ContextType, RequireFields<QueryQueueArgs, 'sessionId'>>
+  sessionQueue?: Resolver<
+    Array<ResolversTypes['Queue']>,
+    ParentType,
+    ContextType,
+    RequireFields<QuerySessionQueueArgs, 'sessionId'>
+  >
+  partyRockers?: Resolver<Array<ResolversTypes['PartyRocker']>, ParentType, ContextType>
+  song?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType, RequireFields<QuerySongArgs, 'songName'>>
+  songs?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType>
 }
 
 export type MutationResolvers<
@@ -300,6 +345,24 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationNextSurveyQuestionArgs, 'surveyId'>
+  >
+  addToQueue?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationAddToQueueArgs, 'input'>
+  >
+  createPartyRocker?: Resolver<
+    ResolversTypes['PartyRocker'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreatePartyRockerArgs, 'input'>
+  >
+  createListeningSession?: Resolver<
+    ResolversTypes['ListeningSession'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateListeningSessionArgs, 'partyRockerId'>
   >
 }
 
@@ -356,8 +419,10 @@ export type ListeningSessionResolvers<
 > = {
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   timeCreated?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  queueLength?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   owner?: Resolver<ResolversTypes['PartyRocker'], ParentType, ContextType>
   partyRockers?: Resolver<Array<ResolversTypes['PartyRocker']>, ParentType, ContextType>
+  queue?: Resolver<Maybe<Array<ResolversTypes['Queue']>>, ParentType, ContextType>
   __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
