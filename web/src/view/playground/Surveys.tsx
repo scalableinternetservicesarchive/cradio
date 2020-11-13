@@ -40,6 +40,7 @@ function SurveyList() {
   if (!data || data.surveys.length === 0) {
     return <div>no surveys</div>
   }
+  console.log(data)
   return (
     <div className="mw6">
       {data.surveys.map((s, i) => (
