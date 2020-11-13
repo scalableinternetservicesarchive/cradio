@@ -60,7 +60,11 @@ function SongList() {
               {data.songs.map(currSong => (
                 <ListItem>
                   <ListItemIcon>
-                    <AddIcon />
+                    <AddIcon
+                      onClick={() => {
+                        console.log(currSong)
+                      }}
+                    />
                   </ListItemIcon>
                   <ListItemText primary={currSong.name} secondary={secondary ? 'Secondary text' : null} />
                 </ListItem>
