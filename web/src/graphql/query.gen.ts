@@ -374,6 +374,28 @@ export interface CreateListeningSessionVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: CreatePartyRocker
+// ====================================================
+
+export interface CreatePartyRocker_createPartyRocker {
+  __typename: "PartyRocker";
+  id: number;
+}
+
+export interface CreatePartyRocker {
+  createPartyRocker: CreatePartyRocker_createPartyRocker;
+}
+
+export interface CreatePartyRockerVariables {
+  input: PartyRockerInfo;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL mutation operation: AnswerSurveyQuestion
 // ====================================================
 
@@ -613,6 +635,10 @@ export interface SurveyQuestion {
 export enum UserType {
   ADMIN = "ADMIN",
   USER = "USER",
+}
+
+export interface PartyRockerInfo {
+  name: string;
 }
 
 export interface SurveyInput {

@@ -1,22 +1,21 @@
 import { gql } from '@apollo/client'
 import { getApolloClient } from '../../graphql/apolloClient'
 import {
-  CreateListeningSession,
-  CreateListeningSessionVariables
+  CreatePartyRocker,
+  CreatePartyRockerVariables,
+  PartyRockerInfo
 } from '../../graphql/query.gen'
 
 // const answerSurveyQuestionMutation = gql`
 //   mutation AnswerSurveyQuestion($input: SurveyInput!) {
 //     answerSurvey(input: $input)
 //   }
-// `
+// `r
 
-const createListeningSessionMutation = gql`
-  mutation CreateListeningSession($partyRockerId: Int!) {
-    createListeningSession(partyRockerId: $partyRockerId) {
+const createPartyRockerMutation = gql`
+  mutation CreatePartyRocker($input: PartyRockerInfo!) {
+    createPartyRocker(input: $input) {
       id
-      timeCreated
-
     }
   }
 `
@@ -35,9 +34,9 @@ const createListeningSessionMutation = gql`
 //   })
 // }
 
-export function createListeningSession(partyRockerId: number) {
-  return getApolloClient().mutate<CreateListeningSession, CreateListeningSessionVariables>({
-    mutation: createListeningSessionMutation,
-    variables: { partyRockerId },
+export function createPartyRocker(input: PartyRockerInfo) {
+  return getApolloClient().mutate<CreatePartyRocker, CreatePartyRockerVariables>({
+    mutation: createPartyRockerMutation,
+    variables: { input },
   })
 }
