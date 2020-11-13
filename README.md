@@ -17,15 +17,15 @@ Grant Roberts + dog (groberts96@gmail.com)
 
 Arpi Beshlikyan (aybeshlikyan@g.ucla.edu)
 
-![image](https://drive.google.com/uc?export=view&id=1ZtWenQu1YPUMKCvU-A2lpUbpkTpbMqJQ)
+<!-- TODO: ![image](Arpi's profile pic link here)  -->
 
 Daniel Jaffe (daniel.jaffe@ucla.edu)
 
 ![image](https://i.ibb.co/qWL9md5/profile-pic.jpg)
 
-Robert Chang <!-- TODO: (Roberts email here)  -->
+Robert Chang (robertchang25@g.ucla.edu)
 
-<!-- TODO: ![image](Robert's profile pic link here)  -->
+![image](https://i.ibb.co/SV809GB/00100l-PORTRAIT-00100-BURST20190803104947233-COVER-1.jpg)
 
 
 
