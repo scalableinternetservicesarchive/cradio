@@ -25,7 +25,7 @@ Daniel Jaffe (daniel.jaffe@ucla.edu)
 
 Robert Chang (robertchang25@g.ucla.edu)
 
-![image](https://i.ibb.co/SV809GB/00100l-PORTRAIT-00100-BURST20190803104947233-COVER-1.jpg)
+![image](https://i.ibb.co/cD08CH9/00100l-PORTRAIT-00100-BURST20190803104947233-COVER-1.jpg)
 
 
 
