@@ -17,7 +17,7 @@ Grant Roberts + dog (groberts96@gmail.com)
 
 Arpi Beshlikyan (aybeshlikyan@g.ucla.edu)
 
-<!-- TODO: ![image](Arpi's profile pic link here)  -->
+![image](https://drive.google.com/uc?export=view&id=1ZtWenQu1YPUMKCvU-A2lpUbpkTpbMqJQ)
 
 Daniel Jaffe (daniel.jaffe@ucla.edu)
 
