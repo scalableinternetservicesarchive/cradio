@@ -120,6 +120,18 @@ export const graphqlRoot: Resolvers<Context> = {
 
 
       return listeningSession
+    },
+    joinListeningSession: async (_, { input }, ctx) => {
+      const { partyRockerId, sessionId } = input
+      const partyRocker = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
+      const listeningSession = check(await ListeningSession.findOne({ where: { id: sessionId }, relations: ['partyRockers']}))
+
+      listeningSession.partyRockers.push(partyRocker)
+
+      await listeningSession.save()
+      partyRocker.listeningSession = listeningSession
+      await partyRocker.save()
+      return true
     }
   },
   Subscription: {

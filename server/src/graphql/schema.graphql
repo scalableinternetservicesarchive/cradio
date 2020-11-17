@@ -41,6 +41,8 @@ type Mutation {
   createPartyRocker(input: PartyRockerInfo!): PartyRocker!
 
   createListeningSession(partyRockerId: Int!): ListeningSession!
+
+  joinListeningSession(input: JoinSessionInfo!): Boolean!
 }
 
 type Subscription {
@@ -152,4 +154,9 @@ input QueueInfo {
 
 input PartyRockerInfo {
   name: String!
+}
+
+input JoinSessionInfo {
+  partyRockerId: Int!
+  sessionId: Int!
 }

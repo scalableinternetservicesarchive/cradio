@@ -1,31 +1,49 @@
 //import { useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { navigate, RouteComponentProps } from '@reach/router'
 import * as React from 'react'
 import { Button, Form } from 'react-bootstrap'
 import { Colors } from '../../../../common/src/colors'
-//import { FetchListeningSession, FetchListeningSessionVariables } from '../../graphql/query.gen'
+import { FetchListeningSession, FetchListeningSessionVariables } from '../../graphql/query.gen'
 import { H1, H3 } from '../../style/header'
 import { style } from '../../style/styled'
 import { AppRouteParams, getPath, Route } from '../nav/route'
-//import { fetchListeningSession } from '../playground/fetchListeningSession'
-import { Page } from './Page'
+import { fetchListeningSession } from '../playground/fetchListeningSession'
 // import { createPartyRocker } from '../playground/mutatePartyRockers'
+import { Page } from './Page'
 // import { createListeningSession } from '../playground/mutateListeningSession'
 
 interface HomePageProps extends RouteComponentProps, AppRouteParams { }
 
 export function HomePage(props: HomePageProps) {
 	const [username, setUsername] = React.useState("");
-	const [sessionID, setSessionID] = React.useState("");
+	const [sessionID, setSessionID] = React.useState(0);
 
 
 
 	function joinSession(): void {
-		// <createPartyRocker/ >
-		//const { data } = useQuery<FetchListeningSession, FetchListeningSessionVariables>(fetchListeningSession, { sessionId: 1 })
-		const newURL = getPath(Route.LECTURES_NEW, { sessionID: 1 })
-		console.log(newURL)
-		navigate(newURL)
+		// Verify a valid possible session ID was entered
+		if (sessionID <= 0) { alert("Not a valid session id"); return; }
+
+		// Fetch the session data from the database
+		const { data } = useQuery<FetchListeningSession, FetchListeningSessionVariables>(fetchListeningSession, { variables: { sessionId: sessionID } })
+
+		// Return if no session found
+		if (data == null) { alert("Session not found."); return; }
+
+		// Verify unique name. Create a new party rocker before joining the new session
+		data.listeningSession?.partyRockers.forEach(element => {
+			if (element.name === username) { alert("Name taken."); return; }
+		});
+
+		// Create new party rocker
+		// const { partyRocker } = createPartyRocker({ name: username });
+
+		// Add the party rocker to the session
+
+
+		// Navigate to the specified session
+		navigate(getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id }))
 	}
 
 	// function createSession() {
@@ -56,7 +74,7 @@ export function HomePage(props: HomePageProps) {
 
 				<Form.Group>
 					<Form.Label>Session ID</Form.Label>
-					<Form.Control type="text" placeholder="Session ID" onChange={(event) => setSessionID(event.target.value)} />
+					<Form.Control type="number" placeholder="Session ID" onChange={(event) => setSessionID(Number(event.target.value))} />
 				</Form.Group>
 				<Button variant="primary" type="submit" onClick={() => joinSession()} >
 					Submit

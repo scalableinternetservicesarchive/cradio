@@ -73,7 +73,7 @@ export interface AppRouteParams {
 export function routeParams(params: AppRouteParams) {
   return {
     userId: Number(params.userId || 0),
-    sessionID: Number(params.sessionID || 0),
+    sessionId: Number(params.sessionID || 0),
     app: params.app,
   }
 }

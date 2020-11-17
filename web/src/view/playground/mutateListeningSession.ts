@@ -2,42 +2,41 @@ import { gql } from '@apollo/client'
 import { getApolloClient } from '../../graphql/apolloClient'
 import {
   CreateListeningSession,
-  CreateListeningSessionVariables
+  CreateListeningSessionVariables,
+  JoinListeningSession,
+  JoinListeningSessionVariables,
+  JoinSessionInfo
 } from '../../graphql/query.gen'
 
-// const answerSurveyQuestionMutation = gql`
-//   mutation AnswerSurveyQuestion($input: SurveyInput!) {
-//     answerSurvey(input: $input)
-//   }
-// `
 
+
+// For creating new listening sessions
 const createListeningSessionMutation = gql`
   mutation CreateListeningSession($partyRockerId: Int!) {
     createListeningSession(partyRockerId: $partyRockerId) {
       id
       timeCreated
-
     }
   }
 `
-
-// mutation { createListeningSession(partyRockerId:1){
-//   id
-//   timeCreated
-//   partyRockers{name}
-// }}
-
-//WHAT IS THE DIFFERENCE BETWEEN PASSING THE CLIENT LIKE THIS AND USING GETAPOLLOCLIENT() LIKE BELOW
-// export function answerSurveyQuestion(client: ApolloClient<any>, input: SurveyInput) {
-//   return client.mutate<AnswerSurveyQuestion, AnswerSurveyQuestionVariables>({
-//     mutation: answerSurveyQuestionMutation,
-//     variables: { input },
-//   })
-// }
 
 export function createListeningSession(partyRockerId: number) {
   return getApolloClient().mutate<CreateListeningSession, CreateListeningSessionVariables>({
     mutation: createListeningSessionMutation,
     variables: { partyRockerId },
+  })
+}
+
+
+// For adding to an existing session
+const joinListeningSessionMutation = gql`
+  mutation JoinListeningSession($input: JoinSessionInfo!) {
+    joinListeningSession(input: $input)
+  }
+`
+export function joinListeningSession(input: JoinSessionInfo) {
+  return getApolloClient().mutate<JoinListeningSession, JoinListeningSessionVariables>({
+    mutation: joinListeningSessionMutation,
+    variables: { input },
   })
 }
