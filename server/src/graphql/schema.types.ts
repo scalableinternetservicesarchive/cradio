@@ -52,6 +52,7 @@ export interface Mutation {
   addToQueue: Scalars['Boolean']
   createPartyRocker: PartyRocker
   createListeningSession: ListeningSession
+  joinListeningSession: Scalars['Boolean']
 }
 
 export interface MutationAnswerSurveyArgs {
@@ -72,6 +73,10 @@ export interface MutationCreatePartyRockerArgs {
 
 export interface MutationCreateListeningSessionArgs {
   partyRockerId: Scalars['Int']
+}
+
+export interface MutationJoinListeningSessionArgs {
+  input: JoinSessionInfo
 }
 
 export interface Subscription {
@@ -180,6 +185,11 @@ export interface PartyRockerInfo {
   name: Scalars['String']
 }
 
+export interface JoinSessionInfo {
+  partyRockerId: Scalars['Int']
+  sessionId: Scalars['Int']
+}
+
 export type ResolverTypeWrapper<T> = Promise<T> | T
 
 export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
@@ -276,6 +286,7 @@ export type ResolversTypes = {
   SurveyInput: SurveyInput
   QueueInfo: QueueInfo
   PartyRockerInfo: PartyRockerInfo
+  JoinSessionInfo: JoinSessionInfo
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -298,6 +309,7 @@ export type ResolversParentTypes = {
   SurveyInput: SurveyInput
   QueueInfo: QueueInfo
   PartyRockerInfo: PartyRockerInfo
+  JoinSessionInfo: JoinSessionInfo
 }
 
 export type QueryResolvers<
@@ -363,6 +375,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationCreateListeningSessionArgs, 'partyRockerId'>
+  >
+  joinListeningSession?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationJoinListeningSessionArgs, 'input'>
   >
 }
 

@@ -23,11 +23,11 @@ const otherTabs = [
     path: getPath(Route.LECTURES),
   },
   {
-    name: 'projects',
+    name: 'Projects',
     path: getPath(Route.PROJECTS),
   },
   {
-    name: 'playground',
+    name: 'Playground',
     path: getPath(Route.PLAYGROUND),
   },
 ]
