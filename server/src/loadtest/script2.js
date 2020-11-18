@@ -6,26 +6,36 @@ export const options = {
   scenarios: {
     example_scenario: {
       // name of the executor to use
-      executor: 'ramping-arrival-rate',
-      // common scenario configuration
-      startRate: '50',
-      timeUnit: '1s',
-      // executor-specific configuration
-      preAllocatedVUs: 50,
-      maxVUs: 100,
+      executor: 'ramping-vus',
+      startVUs: 0,
       stages: [
-        { target: 200, duration: '30s' },
-        { target: 0, duration: '30s' },
+        { target: 500, duration: '60s' },
+        { target: 0, duration: '60s' },
       ],
+      gracefulRampDown: '0s',
     },
   },
 }
 
 export default function () {
   // recordRates(
-  const resp = http.post(
+  // const resp =
+  const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
+  http.post(
     'http://localhost:3000/graphql',
-    '{"operationName":"AnswerSurveyQuestion","variables":{"input":{"answer":"🤗","questionId":1}},"query":"mutation AnswerSurveyQuestion($input: SurveyInput!) {\\n  answerSurvey(input: $input)\\n}\\n"}',
+    //'{"operationName":"CreatePartyRocker","variables":{"input":{"name":"${String(__VU)}"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker/////(input: $input) { \\n id }}"}',
+    nameGen,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+  sleep(Math.random(3));
+  const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + String(__VU) + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
+  http.post(
+    'http://localhost:3000/graphql',
+    sessGen,
     {
       headers: {
         'Content-Type': 'application/json',
@@ -33,8 +43,8 @@ export default function () {
     }
   )
   // )
-  sleep(1)
-  http.get('http://localhost:3000')
+  /*sleep(1)
+  http.get('http://localhost:3000')*/
 }
 
 const count200 = new Counter('status_code_2xx')
