@@ -12,28 +12,28 @@ import { link } from './Link'
 import { getLoginPath, getPath, getSurveyPath, Route } from './route'
 
 const title = {
-  name: 'CS188',
+  name: 'CRADIO',
   path: getPath(Route.HOME),
   title: true,
 }
 
-const otherTabs = [
-  {
-    name: 'Sessions',
-    path: getPath(Route.LECTURES),
-  },
-  {
-    name: 'Projects',
-    path: getPath(Route.PROJECTS),
-  },
-  {
-    name: 'Playground',
-    path: getPath(Route.PLAYGROUND),
-  },
-]
+// const otherTabs = [
+//   {
+//     name: 'Sessions',
+//     path: getPath(Route.LECTURES),
+//   },
+//   {
+//     name: 'Projects',
+//     path: getPath(Route.PROJECTS),
+//   },
+//   {
+//     name: 'Playground',
+//     path: getPath(Route.PLAYGROUND),
+//   },
+// ]
 
 export function NavBar() {
-  const location = useLocation()
+ // const location = useLocation()
   const isSmall = useMediaQuery(breakpoints.small)
   const [showMenu, setShowMenu] = React.useState(false)
   const [toast, setToast] = React.useState<Toast | null>(null)
@@ -56,7 +56,7 @@ export function NavBar() {
     return void 0
   }, [toast])
 
-  const tabs = isSmall ? [otherTabs.find(t => location.pathname.startsWith(t.path)) || otherTabs[0]] : otherTabs
+//  const tabs = isSmall ? [otherTabs.find(t => location.pathname.startsWith(t.path)) || otherTabs[0]] : otherTabs
 
   return (
     <>
@@ -70,9 +70,9 @@ export function NavBar() {
           {isSmall && <div style={{ flex: 1 }} />}
 
           {/* layout additional tabs (possibly hidden for small screens) */}
-          {tabs.map((tab, i) => (
+          {/* {tabs.map((tab, i) => (
             <NavItem key={i} {...tab} />
-          ))}
+          ))} */}
 
           {isSmall && <NavMenu show={showMenu} onClick={() => setShowMenu(!showMenu)} />}
         </Nav>
@@ -89,11 +89,11 @@ function NavMenu(props: { show: boolean; onClick: () => void }) {
       <MenuIcon />
       {props.show && (
         <Modal>
-          <NavMenuModal>
+          {/* <NavMenuModal>
             {otherTabs.map((tab, i) => (
               <NavItem key={i} {...tab} />
             ))}
-          </NavMenuModal>
+          </NavMenuModal> */}
         </Modal>
       )}
     </NavMenuButton>
@@ -123,7 +123,7 @@ const Nav = style(
     opacity: '0.9',
     paddingTop: p.$isSubNav ? 0 : undefined,
     paddingBottom: p.$isSubNav ? 0 : undefined,
-    justifyContent: p.$isSubNav ? 'flex-end' : 'space-between',
+    justifyContent: p.$isSubNav ? 'center' : 'center',
   })
 )
 
@@ -148,11 +148,11 @@ const NavLink = link(NavAnchor)
 
 const NavMenuButton = style('div', 'ml3 pa2 hover-bg-black-10 pointer')
 
-const NavMenuModal = style(
-  'div',
-  'avenir f4 fixed flex flex-column items-center top-0 br3 pa3 right-0 bg-black-90 mt5 mr4 mr5-ns',
-  { zIndex: 100 }
-)
+// const NavMenuModal = style(
+//   'div',
+//   'avenir f4 fixed flex flex-column items-center top-0 br3 pa3 right-0 bg-black-90 mt5 mr4 mr5-ns',
+//   { zIndex: 100 }
+// )
 
 const ToastContainer = style<'div', { $isError?: boolean }>(
   'div',
