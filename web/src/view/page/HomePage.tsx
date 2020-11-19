@@ -8,7 +8,7 @@ import { H1, H3 } from '../../style/header'
 import { style } from '../../style/styled'
 import { AppRouteParams, getPath, Route } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
-import { joinListeningSession } from '../playground/mutateListeningSession'
+import { createListeningSession, joinListeningSession } from '../playground/mutateListeningSession'
 import { createPartyRocker } from '../playground/mutatePartyRockers'
 import { Page } from './Page'
 
@@ -47,6 +47,7 @@ export function HomePage(props: HomePageProps) {
 		if (data == null) { alert("Session not found."); return; }
 
     //Verify unique name. Create a new party rocker before joining the new session
+    //ask about how to get past this ts ignore and actually make it right!!!!!!!!!!
     //@ts-ignore
 		data.listeningSession?.partyRockers.forEach(element=> {
 			if (element.name === username) { alert("Name taken."); return; }
@@ -75,6 +76,37 @@ export function HomePage(props: HomePageProps) {
     navigate(getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id}))
 
 
+  }
+
+  async function createSession(event: React.MouseEvent): Promise<void> {
+
+    event.preventDefault();
+
+
+
+		// Create new party rocker
+    const partyRocker = await createPartyRocker({ name: username });
+    let partyRockerId;
+
+    if((partyRocker?.data?.createPartyRocker.id) == undefined){
+      alert("Failed to Create a user");
+      return;
+    }
+    else {
+     partyRockerId = partyRocker?.data?.createPartyRocker.id;
+    }
+
+    // Add the party rocker to the session
+
+    const joinRes = await createListeningSession( partyRockerId)
+    if(!(joinRes?.data?.createListeningSession.id)){
+      alert("Failed to Join session.");
+      return;
+    }
+
+    navigate(getPath(Route.LECTURES_NEW, { sessionId: joinRes?.data?.createListeningSession.id}))
+
+
 	}
 
 	// function createSession() {
@@ -90,7 +122,7 @@ export function HomePage(props: HomePageProps) {
 			<Hero>
 				<H1>Cradio</H1>
 				<H3>Start Listening Parties with you friends! Request Music!</H3>
-				<H3>UCLA, Fall 2020</H3>
+				<H3>UCLA,  Fall 2020</H3>
 				{username}
 				{sessionID}
         {/* {'\n'}
@@ -114,9 +146,13 @@ export function HomePage(props: HomePageProps) {
 					<Form.Control type="number" placeholder="Session ID" onChange={handleChange} />
 				</Form.Group>
 				<Button variant="primary" type="submit" onClick={joinSession} >
-					Submit
+					Join Session
        			</Button>
 			</Form>
+      <H3> OR</H3>
+      <Button variant="primary" type="submit" onClick={createSession} >
+					Create Session
+       			</Button>
 		</Page>
 	)
 }
