@@ -8,9 +8,9 @@ import { H1, H3 } from '../../style/header'
 import { style } from '../../style/styled'
 import { AppRouteParams, getPath, Route } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
-// import { createPartyRocker } from '../playground/mutatePartyRockers'
+import { joinListeningSession } from '../playground/mutateListeningSession'
+import { createPartyRocker } from '../playground/mutatePartyRockers'
 import { Page } from './Page'
-// import { createListeningSession } from '../playground/mutateListeningSession'
 
 interface HomePageProps extends RouteComponentProps, AppRouteParams { }
 
@@ -53,16 +53,28 @@ export function HomePage(props: HomePageProps) {
 		});
 
 		// Create new party rocker
-		// const { partyRocker } = createPartyRocker({ name: username });
+    const partyRocker = await createPartyRocker({ name: username });
+    let partyRockerId;
+
+    if((partyRocker?.data?.createPartyRocker.id) == undefined){
+      alert("Failed to Create a user");
+      return;
+    }
+    else {
+     partyRockerId = partyRocker?.data?.createPartyRocker.id;
+    }
+
+    // Add the party rocker to the session
+
+    const joinRes = await joinListeningSession({sessionId: data?.listeningSession?.id, partyRockerId: partyRockerId})
+    if(!(joinRes?.data?.joinListeningSession)){
+      alert("Failed to Join session.");
+      return;
+    }
+
+    navigate(getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id}))
 
 
-    console.log("listening session id", data?.listeningSession?.id )
-		// Add the party rocker to the session
-    console.log("going to navigate to path: ", getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id }))
-
-    // Navigate to the specified session
-    console.log("going to navigate to path: ", getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id }))
-    navigate(getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id }))
 	}
 
 	// function createSession() {
@@ -115,7 +127,6 @@ const Hero = style('div', 'mb4 w-100 ba b--mid-gray br2 pa3 tc', {
   borderLeftWidth: '4px',
   borderRightWidth: '4px',
 })
-
 // this is a test comment
 
 // const Content = style('div', 'flex-l')
