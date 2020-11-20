@@ -9,9 +9,11 @@ import Typography from '@material-ui/core/Typography'
 import AddIcon from '@material-ui/icons/Add'
 import { RouteComponentProps } from '@reach/router'
 import * as React from 'react'
-import { FetchSongs } from '../../graphql/query.gen'
+import { FetchListeningSession, FetchListeningSessionVariables, FetchSongs } from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
+import { fetchListeningSession } from '../playground/fetchListeningSession'
 import { fetchSongs } from '../playground/fetchSong'
+import { addToQueue } from '../playground/mutateQueue'
 import { Page } from './Page'
 
 interface LecturesPageProps extends RouteComponentProps, AppRouteParams {}
@@ -30,20 +32,24 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export function LecturesPage(props: LecturesPageProps) {
-  return <SongList />
-}
-
-function SongList() {
+  console.log('LecturesPages')
+  const idSession = Number(props.sessionId)
+  console.log('ID session from lecturePage')
+  console.log(idSession)
   const classes = useStyles()
   const [dense] = React.useState(false)
   const [secondary] = React.useState(false)
-  const { loading, data } = useQuery<FetchSongs>(fetchSongs)
+  const { loading:loadingSongs, data:dataSongs } = useQuery<FetchSongs>(fetchSongs)
+  const {loading:loadingSession, data:sessionData} = useQuery<FetchListeningSession, FetchListeningSessionVariables>(fetchListeningSession, {
+    variables: { sessionId: idSession },
+  })
 
-  console.log(data)
-  if (loading) {
+  console.log(dataSongs)
+  console.log(sessionData)
+  if (loadingSession|| loadingSongs) {
     return <div>loading...</div>
   }
-  if (!data || data.songs.length === 0) {
+  if (!dataSongs || dataSongs.songs.length === 0) {
     return <div>no songs</div>
   }
 
@@ -57,12 +63,13 @@ function SongList() {
           </Typography>
           <div className={classes.demo}>
             <List dense={dense}>
-              {data.songs.map(currSong => (
+              {dataSongs.songs.map(currSong => (
                 <ListItem>
                   <ListItemIcon>
                     <AddIcon
                       onClick={() => {
                         console.log(currSong)
+                        addToQueue({ songId: currSong.id, listeningSessionId: idSession })
                       }}
                     />
                   </ListItemIcon>
