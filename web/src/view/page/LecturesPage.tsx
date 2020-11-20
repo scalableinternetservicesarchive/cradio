@@ -38,22 +38,25 @@ export function LecturesPage(props: LecturesPageProps) {
   console.log(idSession)
   const classes = useStyles()
   const [dense] = React.useState(false)
+  const [songQueue, setQueue] = React.useState<Array<string>>([])
   const [secondary] = React.useState(false)
-  const { loading:loadingSongs, data:dataSongs } = useQuery<FetchSongs>(fetchSongs)
-  const {loading:loadingSession, data:sessionData} = useQuery<FetchListeningSession, FetchListeningSessionVariables>(fetchListeningSession, {
+  const { loading: loadingSongs, data: dataSongs } = useQuery<FetchSongs>(fetchSongs)
+  const { loading: loadingSession, data: sessionData } = useQuery<
+    FetchListeningSession,
+    FetchListeningSessionVariables
+  >(fetchListeningSession, {
     variables: { sessionId: idSession },
   })
 
   console.log(dataSongs)
   console.log(sessionData)
-  if (loadingSession|| loadingSongs) {
+  if (loadingSession || loadingSongs) {
     return <div>loading...</div>
   }
   if (!dataSongs || dataSongs.songs.length === 0) {
     return <div>no songs</div>
   }
 
-  const list2 = ['queue1', 'queue2']
   return (
     <Page>
       <Grid container>
@@ -69,6 +72,7 @@ export function LecturesPage(props: LecturesPageProps) {
                     <AddIcon
                       onClick={() => {
                         console.log(currSong)
+                        setQueue(current => [...current, currSong.name])
                         addToQueue({ songId: currSong.id, listeningSessionId: idSession })
                       }}
                     />
@@ -85,7 +89,7 @@ export function LecturesPage(props: LecturesPageProps) {
           </Typography>
           <div className={classes.demo}>
             <List dense={dense}>
-              {list2.map(currSong => (
+              {songQueue.map(currSong => (
                 <ListItem>
                   <ListItemText primary={currSong} secondary={secondary ? 'Secondary text' : null} />
                 </ListItem>
