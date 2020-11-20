@@ -17,7 +17,7 @@ export class PartyRocker extends BaseEntity {
   @Column({nullable:true})
   spotifyCreds: string
 
-  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.partyRockers)
+  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.partyRockers,  {onDelete: 'CASCADE' })
   listeningSession: ListeningSession
 
 }
