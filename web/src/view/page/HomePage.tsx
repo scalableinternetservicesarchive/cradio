@@ -42,9 +42,9 @@ export function HomePage(props: HomePageProps) {
   //  await getSession()
 
 
-    console.log("data", data)
+    console.log("data.listeningsession", data.listeningSession)
 		// Return if no session found
-		if (data == null) { alert("Session not found."); return; }
+		if (data.listeningSession == null) { alert("Session not found."); return; }
 
     //Verify unique name. Create a new party rocker before joining the new session
     //ask about how to get past this ts ignore and actually make it right!!!!!!!!!!
