@@ -41,6 +41,16 @@ export function HomePage(props: HomePageProps) {
   // console.log("data from client query", data)
   //  await getSession()
 
+  let idSession: number;
+
+    if((data?.listeningSession?.id) == undefined){
+      alert("Failed Fetch Session");
+      return;
+    }
+    else {
+     idSession = data?.listeningSession?.id;
+    }
+
 
     console.log("data.listeningsession", data.listeningSession)
 		// Return if no session found
@@ -66,14 +76,15 @@ export function HomePage(props: HomePageProps) {
     }
 
     // Add the party rocker to the session
-
-    const joinRes = await joinListeningSession({sessionId: data?.listeningSession?.id, partyRockerId: partyRockerId})
+    const joinRes = await joinListeningSession({sessionId: idSession, partyRockerId: partyRockerId})
     if(!(joinRes?.data?.joinListeningSession)){
       alert("Failed to Join session.");
       return;
     }
 
-    navigate(getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id}))
+
+
+    navigate(getPath(Route.LECTURES_NEW, { sessionId: idSession}))
 
 
   }
