@@ -53,6 +53,7 @@ export interface Mutation {
   createPartyRocker: PartyRocker
   createListeningSession: ListeningSession
   joinListeningSession: Scalars['Boolean']
+  deleteListeningSession: Scalars['Boolean']
 }
 
 export interface MutationAnswerSurveyArgs {
@@ -77,6 +78,10 @@ export interface MutationCreateListeningSessionArgs {
 
 export interface MutationJoinListeningSessionArgs {
   input: JoinSessionInfo
+}
+
+export interface MutationDeleteListeningSessionArgs {
+  sessionId: Scalars['Int']
 }
 
 export interface Subscription {
@@ -381,6 +386,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationJoinListeningSessionArgs, 'input'>
+  >
+  deleteListeningSession?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteListeningSessionArgs, 'sessionId'>
   >
 }
 

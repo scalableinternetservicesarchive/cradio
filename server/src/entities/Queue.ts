@@ -20,6 +20,6 @@ export class Queue extends BaseEntity {
   // @Column('simple-array', { nullable: true })
   // choices: string[]
 
-  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.queue)
+  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.queue, {onDelete: 'CASCADE' })
   listeningSession: ListeningSession
 }

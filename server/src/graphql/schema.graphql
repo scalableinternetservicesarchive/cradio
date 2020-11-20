@@ -43,6 +43,8 @@ type Mutation {
   createListeningSession(partyRockerId: Int!): ListeningSession!
 
   joinListeningSession(input: JoinSessionInfo!): Boolean!
+
+  deleteListeningSession(sessionId: Int!): Boolean!
 }
 
 type Subscription {
