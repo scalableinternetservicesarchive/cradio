@@ -4,6 +4,7 @@ import { navigate, RouteComponentProps } from '@reach/router'
 import * as React from 'react'
 import { Button, Form } from 'react-bootstrap'
 import { Colors } from '../../../../common/src/colors'
+import { FetchListeningSession, FetchListeningSessionVariables } from '../../graphql/query.gen'
 import { H1, H3 } from '../../style/header'
 import { style } from '../../style/styled'
 import { AppRouteParams, getPath, Route } from '../nav/route'
@@ -35,20 +36,28 @@ export function HomePage(props: HomePageProps) {
 
 		// Fetch the session data from the database
   //	const { data } = useQuery<FetchListeningSession, FetchListeningSessionVariables>(fetchListeningSession, { variables: { sessionId: sessionID } })
-  const { data } = await client.query({
+  const { data } = await client.query<FetchListeningSession, FetchListeningSessionVariables>({
     query: fetchListeningSession,  variables: { sessionId: sessionID}
   });
   // console.log("data from client query", data)
   //  await getSession()
 
+  let idSession: number;
 
-    console.log("data", data)
+    if((data?.listeningSession?.id) == undefined){
+      alert("Failed Fetch Session");
+      return;
+    }
+    else {
+     idSession = data?.listeningSession?.id;
+    }
+
+
+    console.log("data.listeningsession", data.listeningSession)
 		// Return if no session found
-		if (data == null) { alert("Session not found."); return; }
+		if (data.listeningSession == null) { alert("Session not found."); return; }
 
     //Verify unique name. Create a new party rocker before joining the new session
-    //ask about how to get past this ts ignore and actually make it right!!!!!!!!!!
-    //@ts-ignore
 		data.listeningSession?.partyRockers.forEach(element=> {
 			if (element.name === username) { alert("Name taken."); return; }
 		});
@@ -66,14 +75,15 @@ export function HomePage(props: HomePageProps) {
     }
 
     // Add the party rocker to the session
-
-    const joinRes = await joinListeningSession({sessionId: data?.listeningSession?.id, partyRockerId: partyRockerId})
+    const joinRes = await joinListeningSession({sessionId: idSession, partyRockerId: partyRockerId})
     if(!(joinRes?.data?.joinListeningSession)){
       alert("Failed to Join session.");
       return;
     }
 
-    navigate(getPath(Route.LECTURES_NEW, { sessionId: data?.listeningSession?.id}))
+
+
+    navigate(getPath(Route.LECTURES_NEW, { sessionId: idSession}))
 
 
   }

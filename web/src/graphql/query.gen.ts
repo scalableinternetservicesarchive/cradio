@@ -344,6 +344,23 @@ export interface FetchSurveyVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: DeleteListeningSession
+// ====================================================
+
+export interface DeleteListeningSession {
+  deleteListeningSession: boolean;
+}
+
+export interface DeleteListeningSessionVariables {
+  sessionId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL mutation operation: CreateListeningSession
 // ====================================================
 
