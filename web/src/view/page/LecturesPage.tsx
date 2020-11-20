@@ -33,23 +33,23 @@ const useStyles = makeStyles(theme => ({
 
 export function LecturesPage(props: LecturesPageProps) {
   console.log('LecturesPages')
-  const idSession = props.sessionId as number
+  const idSession = Number(props.sessionId)
   console.log('ID session from lecturePage')
   console.log(idSession)
   const classes = useStyles()
   const [dense] = React.useState(false)
   const [secondary] = React.useState(false)
-  const { loading, data } = useQuery<FetchSongs>(fetchSongs)
-  const sessionData = useQuery<FetchListeningSession, FetchListeningSessionVariables>(fetchListeningSession, {
+  const { loading:loadingSongs, data:dataSongs } = useQuery<FetchSongs>(fetchSongs)
+  const {loading:loadingSession, data:sessionData} = useQuery<FetchListeningSession, FetchListeningSessionVariables>(fetchListeningSession, {
     variables: { sessionId: idSession },
-  }).data
+  })
 
-  console.log(data)
+  console.log(dataSongs)
   console.log(sessionData)
-  if (loading) {
+  if (loadingSession|| loadingSongs) {
     return <div>loading...</div>
   }
-  if (!data || data.songs.length === 0) {
+  if (!dataSongs || dataSongs.songs.length === 0) {
     return <div>no songs</div>
   }
 
@@ -63,7 +63,7 @@ export function LecturesPage(props: LecturesPageProps) {
           </Typography>
           <div className={classes.demo}>
             <List dense={dense}>
-              {data.songs.map(currSong => (
+              {dataSongs.songs.map(currSong => (
                 <ListItem>
                   <ListItemIcon>
                     <AddIcon
