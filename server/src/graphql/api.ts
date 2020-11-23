@@ -123,6 +123,16 @@ export const graphqlRoot: Resolvers<Context> = {
 
       return listeningSession
     },
+    deleteListeningSession: async (_, { sessionId }, ctx) => {
+
+
+      const entityManager = getManager();
+      check(await entityManager.delete(ListeningSession, { id: sessionId }))
+
+      return true
+
+
+    },
     joinListeningSession: async (_, { input }, ctx) => {
       const { partyRockerId, sessionId } = input
       const partyRocker = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
