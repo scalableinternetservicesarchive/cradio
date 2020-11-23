@@ -19,9 +19,9 @@ export const options = {
 
 export default function () {
   // recordRates(
-  // const resp =
+
   const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
-  http.post(
+  const mainPartyRocker = http.post(
     'http://localhost:3000/graphql',
     //'{"operationName":"CreatePartyRocker","variables":{"input":{"name":"${String(__VU)}"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker/////(input: $input) { \\n id }}"}',
     nameGen,
@@ -31,9 +31,15 @@ export default function () {
       },
     }
   )
+
+  // const partyRockerId = mainPartyRocker.body.match(/[1-9][0-9]*/)
+  const partyRockerId = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
+  // console.log("party rocker: ", partyRockerId)
+
   sleep(Math.random(3));
-  const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + String(__VU) + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
-  http.post(
+
+  const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + partyRockerId + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
+  const mainSession = http.post(
     'http://localhost:3000/graphql',
     sessGen,
     {
@@ -42,10 +48,41 @@ export default function () {
       },
     }
   )
-  // )
-  /*sleep(1)
-  http.get('http://localhost:3000')*/
+
+  sleep(Math.random(3));
+
+  if (typeof mainSession !== 'undefined') {
+    const listeningSessionID = JSON.parse(mainSession.body).data.createListeningSession.id
+    console.log("session creation: " , mainSession.status)
+
+    // const listeningSessionId = mainSession.body.match(/[1-9][0-9]*/)
+
+    const queueGen = '{"operationName":"AddToQueue","variables":{"input":{"songId":'+ String(Math.floor((Math.random()*5)+1)) +', "listeningSessionId":' + String(listeningSessionID) +'}},"query":"  mutation AddToQueue($input: QueueInfo!) { \\n addToQueue(input: $input) \\n}"}'
+    const addToQueueWorked = http.post(
+      'http://localhost:3000/graphql',
+      queueGen,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+
+  // const didAddToQueueWork = JSON.parse(addToQueueWorked.body).data.addToQueue
+  // console.log("adding to queue: ", didAddToQueueWork)
+  // console.log("adding to queue: ", didAddToQueueWork, " sessionID: ", listeningSessionID )
+
+
+  // http.get('http://localhost:3000')
 }
+
+
+// export function teardown() {
+
+
+
+// }
 
 const count200 = new Counter('status_code_2xx')
 const count300 = new Counter('status_code_3xx')
