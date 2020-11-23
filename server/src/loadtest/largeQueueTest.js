@@ -55,23 +55,40 @@ export default function (data) {
 
   //we want to queue a "random" song out of the list of songs instead of queueing the same song every time
   //generate a song id to use
-  const songId = __VU % 4
-  console.log('song Id: ', songId)
+  //does this add to the time taken???????
+
+  const songId = (__VU % 6) + 1
 
   const addToQueueResult = http.post(
     'http://localhost:3000/graphql',
-    `{"operationName":"addToQueue","variables":{"input": {"songId":${songId}, "listeningSessionId": ${data.sessionId}}},"query":"mutation AddToQueue($input: QueueInfo!) { \\n addToQueue(input: $input)}"}`,
+    `{"operationName":"AddToQueue","variables":{"input": {"songId":${songId}, "listeningSessionId": ${data.sessionId}}},"query":"mutation AddToQueue($input: QueueInfo!) { \\n addToQueue(input: $input)}"}`,
     {
       headers: {
         'Content-Type': 'application/json',
       },
     }
   )
-  sleep(Math.random(4))
+  console.log('add to queue result: ', addToQueueResult.body)
+  sleep(Math.random(2))
 
   // )
   /*sleep(1)
   http.get('http://localhost:3000')*/
+}
+
+export function teardown(data) {
+  //delete the listensing session (and therefore the related queue)
+  const deleteSessionResult = http.post(
+    'http://localhost:3000/graphql',
+    `{"operationName":"DeleteListeningSession","variables":{"sessionId":${data.sessionId}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+
+  console.log(deleteSessionResult.body)
 }
 
 const count200 = new Counter('status_code_2xx')
