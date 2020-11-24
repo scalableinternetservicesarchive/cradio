@@ -17,6 +17,11 @@ export const options = {
   },
 }
 
+const partyRockerCreation_Success = new Counter('PartyRocker_Creation_Success')
+const listeningSessionCreation_Success = new Counter('ListeningSession_Creation_Success')
+const addToQueue_Success = new Counter('AddToQueue_Creation_Success')
+let i = 1
+
 export default function () {
   // recordRates(
 
@@ -32,51 +37,62 @@ export default function () {
     }
   )
 
-  // const partyRockerId = mainPartyRocker.body.match(/[1-9][0-9]*/)
-  const partyRockerId = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
-  // console.log("party rocker: ", partyRockerId)
+  console.log('iteration: ', i++, ' body: ', mainPartyRocker.body)
 
-  sleep(Math.random(3));
+  if ((mainPartyRocker.status >= 200 && mainPartyRocker.status < 300) || mainPartyRocker.body !== 'undefined') {
+    partyRockerCreation_Success.add(1)
+    // const partyRockerId = mainPartyRocker.body.match(/[1-9][0-9]*/)
+    const partyRockerId = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
+    // console.log("party rocker: ", partyRockerId)
 
-  const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + partyRockerId + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
-  const mainSession = http.post(
-    'http://localhost:3000/graphql',
-    sessGen,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  )
+    sleep(Math.random(3));
 
-  sleep(Math.random(3));
-
-  if (typeof mainSession !== 'undefined') {
-    const listeningSessionID = JSON.parse(mainSession.body).data.createListeningSession.id
-    console.log("session creation: " , mainSession.status)
-
-    // const listeningSessionId = mainSession.body.match(/[1-9][0-9]*/)
-
-    const queueGen = '{"operationName":"AddToQueue","variables":{"input":{"songId":'+ String(Math.floor((Math.random()*5)+1)) +', "listeningSessionId":' + String(listeningSessionID) +'}},"query":"  mutation AddToQueue($input: QueueInfo!) { \\n addToQueue(input: $input) \\n}"}'
-    const addToQueueWorked = http.post(
+    const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + partyRockerId + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
+    const mainSession = http.post(
       'http://localhost:3000/graphql',
-      queueGen,
+      sessGen,
       {
         headers: {
           'Content-Type': 'application/json',
         },
       }
     )
-  }
+
+    sleep(Math.random(3));
+
+    // if (typeof mainSession !== 'undefined') {
+    if (mainSession.status >= 200 && mainSession.status < 300) {
+      listeningSessionCreation_Success.add(1)
+
+      const listeningSessionID = JSON.parse(mainSession.body).data.createListeningSession.id
+      // console.log("session creation: " , mainSession.status)
+
+      // const listeningSessionId = mainSession.body.match(/[1-9][0-9]*/)
+
+      const queueGen = '{"operationName":"AddToQueue","variables":{"input":{"songId":'+ String(Math.floor((Math.random()*5)+1)) +', "listeningSessionId":' + String(listeningSessionID) +'}},"query":"  mutation AddToQueue($input: QueueInfo!) { \\n addToQueue(input: $input) \\n}"}'
+      const addToQueueWorked = http.post(
+        'http://localhost:3000/graphql',
+        queueGen,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      // if (typeof addToQueueWorked !== 'undefined') {
+      if (addToQueueWorked.status >= 200 && addToQueueWorked.status < 300) {
+        addToQueue_Success.add(1)
+      }
+    }
 
   // const didAddToQueueWork = JSON.parse(addToQueueWorked.body).data.addToQueue
   // console.log("adding to queue: ", didAddToQueueWork)
   // console.log("adding to queue: ", didAddToQueueWork, " sessionID: ", listeningSessionID )
 
-
+  }
   // http.get('http://localhost:3000')
 }
-
 
 // export function teardown() {
 
