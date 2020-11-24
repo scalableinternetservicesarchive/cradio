@@ -3,16 +3,24 @@ import { sleep } from 'k6'
 import { Counter, Rate } from 'k6/metrics'
 
 export const options = {
+  // scenarios: {
+  //   example_scenario: {
+  //     // name of the executor to use
+  //     executor: 'ramping-vus',
+  //     startVUs: 0,
+  //     stages: [
+  //       { target: 500, duration: '60s' },
+  //       { target: 0, duration: '60s' },
+  //     ],
+  //     gracefulRampDown: '0s',
+  //   },
+  // },
   scenarios: {
-    example_scenario: {
-      // name of the executor to use
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { target: 500, duration: '60s' },
-        { target: 0, duration: '60s' },
-      ],
-      gracefulRampDown: '0s',
+    contacts: {
+      executor: 'per-vu-iterations', //500 iterators each running the function once
+      vus: 500,
+      iterations: 1,
+      maxDuration: '30s',
     },
   },
 }
@@ -28,9 +36,9 @@ export function setup() {
       },
     }
   )
-  console.log('partyRockerCreateResul', createPartyRockerresult.body)
+  //  console.log('partyRockerCreateResul', createPartyRockerresult.body)
   const jsonResult = JSON.parse(createPartyRockerresult.body)
-  console.log('jsonResult', jsonResult.data.createPartyRocker.id)
+  //console.log('jsonResult', jsonResult.data.createPartyRocker.id)
 
   //create listening session to queue the songs in
   const createSessionResult = http.post(
@@ -43,20 +51,22 @@ export function setup() {
     }
   )
 
-  console.log(createSessionResult.body)
+  // console.log(createSessionResult.body)
 
   const sessionJson = JSON.parse(createSessionResult.body)
-  console.log('createSession json result', sessionJson.data.createListeningSession.id)
+  //console.log('createSession json result', sessionJson.data.createListeningSession.id)
+
   return { sessionId: sessionJson.data.createListeningSession.id }
 }
 
 export default function (data) {
   // recordRates(
 
+  sleep(Math.random(2))
+
   //we want to queue a "random" song out of the list of songs instead of queueing the same song every time
   //generate a song id to use
   //does this add to the time taken???????
-
   const songId = (__VU % 6) + 1
 
   const addToQueueResult = http.post(
@@ -68,12 +78,8 @@ export default function (data) {
       },
     }
   )
-  console.log('add to queue result: ', addToQueueResult.body)
-  sleep(Math.random(2))
-
-  // )
-  /*sleep(1)
-  http.get('http://localhost:3000')*/
+  //record rates and counts of status counts
+  recordRates(addToQueueResult)
 }
 
 export function teardown(data) {
