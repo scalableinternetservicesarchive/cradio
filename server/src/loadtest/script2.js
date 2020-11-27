@@ -12,7 +12,7 @@ export const options = {
         { target: 500, duration: '60s' },
         { target: 0, duration: '60s' },
       ],
-      gracefulRampDown: '0s',
+      gracefulRampDown: '90s',
     },
   },
 }
@@ -20,7 +20,6 @@ export const options = {
 const partyRockerCreation_Success = new Counter('PartyRocker_Creation_Success')
 const listeningSessionCreation_Success = new Counter('ListeningSession_Creation_Success')
 const addToQueue_Success = new Counter('AddToQueue_Creation_Success')
-let i = 1
 
 export default function () {
   // recordRates(
@@ -37,11 +36,10 @@ export default function () {
     }
   )
 
-  console.log('iteration: ', i++, ' body: ', mainPartyRocker.body)
+  //console.log('iteration: ', i++, ' body: ', mainPartyRocker.body)
 
-  if ((mainPartyRocker.status >= 200 && mainPartyRocker.status < 300) || mainPartyRocker.body !== 'undefined') {
+  if (mainPartyRocker.status >= 200 && mainPartyRocker.status < 300) {
     partyRockerCreation_Success.add(1)
-    // const partyRockerId = mainPartyRocker.body.match(/[1-9][0-9]*/)
     const partyRockerId = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
     // console.log("party rocker: ", partyRockerId)
 

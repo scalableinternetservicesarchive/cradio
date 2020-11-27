@@ -2,6 +2,7 @@ import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
 import path from 'path'
 import { getManager } from 'typeorm'
+//import { getManager } from 'typeorm'
 import { check } from '../../../common/src/util'
 import { ListeningSession } from '../entities/ListeningSession'
 import { PartyRocker } from '../entities/PartyRocker'
@@ -68,24 +69,25 @@ export const graphqlRoot: Resolvers<Context> = {
       const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
       const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song']}))
 
-
-
-
       const queueItem = new Queue()
       queueItem.score = 0
       queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
       queueItem.song = song
+     // console.log("listening session: ",listeningSession)
       queueItem.listeningSession = listeningSession
-      await queueItem.save()
+      //console.log("Queue Item", queueItem)
+      check(await queueItem.save())
 
-      //adding the queue item to the listneing session
-      console.log("listening session queue", listeningSession.queue)
-      listeningSession.queue.push(queueItem)
-      listeningSession.save()
+    // adding the queue item to the listneing session
+    //   console.log("listening session queue", listeningSession.queue)
+    //  listeningSession.queue.push(queueItem)
+    //  check(await listeningSession.save())
 
-      //incrementing length of listeningSession.queueLength
-      const entityManager = getManager();
-      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
+    //check this below, is this creating a race condition???
+    //  incrementing length of listeningSession.queueLength
+     const entityManager = getManager();
+     // change this to saving the entity above???
+     check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
 
 
       return true
