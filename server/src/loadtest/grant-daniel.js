@@ -4,17 +4,15 @@ import { Counter, Rate } from 'k6/metrics'
 
 export const options = {
   scenarios: {
-    example_scenario: {
-      // name of the executor to use
-      executor: 'ramping-vus',
-      startVUs: 0,
-      stages: [
-        { target: 500, duration: '60s' },
-        { target: 0, duration: '60s' },
-      ],
-      gracefulRampDown: '0s',
+    scenarios: {
+      contacts: {
+        executor: 'per-vu-iterations', //500 iterators each running the function once
+        vus: 500,
+        iterations: 1,
+        maxDuration: '60s',
+      },
     },
-  },
+  }
 }
 
 const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
@@ -84,7 +82,17 @@ export default function (data) {
 
 export function teardown(data) {
 
-  // mutation {deleteListeningSession(sessionId: 10)}
+  const deleteSessionResult = http.post(
+    'http://localhost:3000/graphql',
+    `{"operationName":"DeleteListeningSession","variables":{"sessionId":${data.sessionId}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+
+  console.log(deleteSessionResult.body)
 
 }
 
