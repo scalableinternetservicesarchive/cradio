@@ -27,10 +27,10 @@ export function HomePage(props: HomePageProps) {
   };
 
 	async function joinSession(event: React.MouseEvent): Promise<void> {
-    console.log("in join session")
+//     console.log("in join session")
     event.preventDefault();
 
-  console.log("sessionID from state", sessionID)
+//   console.log("sessionID from state", sessionID)
 		// Verify a valid possible session ID was entered
 		if (sessionID <= 0) { alert("Not a valid session id"); return; }
 
@@ -53,7 +53,7 @@ export function HomePage(props: HomePageProps) {
     }
 
 
-    console.log("data.listeningsession", data.listeningSession)
+//     console.log("data.listeningsession", data.listeningSession)
 		// Return if no session found
 		if (data.listeningSession == null) { alert("Session not found."); return; }
 
