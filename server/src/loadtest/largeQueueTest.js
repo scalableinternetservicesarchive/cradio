@@ -63,7 +63,7 @@ export default function (data) {
   // recordRates(
 
   const sleepTime = Math.floor(Math.random() * Math.floor(20)) + 1
-  console.log('sleeping for: ', sleepTime)
+//   console.log('sleeping for: ', sleepTime)
   sleep(sleepTime)
 
   //we want to queue a "random" song out of the list of songs instead of queueing the same song every time
