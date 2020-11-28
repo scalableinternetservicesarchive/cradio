@@ -42,8 +42,8 @@ export function setup() {
     }
   )
   const sessionID = JSON.parse(mainSession.body).data.createListeningSession.id
-  console.log(mainID)
-  console.log(sessionID)
+//   console.log(mainID)
+//   console.log(sessionID)
   return {sessionID: sessionID}
 }
 
@@ -61,7 +61,7 @@ export default function (data) {
       },
     }
   )
-  console.log("sessionid", data.sessionID)
+//   console.log("sessionid", data.sessionID)
   const sessGen = `{"operationName":"JoinListeningSession","variables":{"input": {"partyRockerId":${JSON.parse(newPartyRocker.body).data.createPartyRocker.id}, "sessionId": ${data.sessionID}}},"query":"mutation JoinListeningSession($input: JoinSessionInfo!) {\\n joinListeningSession(input: $input)}"}`
 
   const joinSession = http.post(
@@ -74,7 +74,7 @@ export default function (data) {
     }
   )
 
-  console.log("join session body",joinSession.body)
+//   console.log("join session body",joinSession.body)
 }
 
 
@@ -92,7 +92,7 @@ export function teardown(data) {
     }
   )
 
-  console.log(deleteSessionResult.body)
+//   console.log(deleteSessionResult.body)
 
 }
 
@@ -111,7 +111,7 @@ function recordRates(res) {
     count200.add(1)
     rate200.add(1)
   } else if (res.status >= 300 && res.status < 400) {
-    console.log(res.body)
+//     console.log(res.body)
     count300.add(1)
     rate300.add(1)
   } else if (res.status >= 400 && res.status < 500) {
