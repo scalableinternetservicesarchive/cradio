@@ -103,7 +103,7 @@ export const graphqlRoot: Resolvers<Context> = {
     },
     createListeningSession: async (_, { partyRockerId }, ctx) => {
       const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
-      console.log(owner)
+//       console.log(owner)
 
       const listeningSession = new ListeningSession()
 
