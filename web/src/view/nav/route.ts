@@ -10,6 +10,7 @@ export enum Route {
   PROJECTS = 'app/projects',
   PLAYGROUND = 'app/playground',
   PLAYGROUND_APP = 'app/playground/:app',
+  LECTURES_NEW = 'app/lectures/:sessionId'
 }
 
 export enum PlaygroundApp {
@@ -63,6 +64,7 @@ export function getPath(route: Route, arg?: Partial<ReturnType<typeof routeParam
 export interface AppRouteParams {
   userId?: string
   app?: PlaygroundApp
+  sessionId?: number
 }
 
 /**
@@ -71,6 +73,7 @@ export interface AppRouteParams {
 export function routeParams(params: AppRouteParams) {
   return {
     userId: Number(params.userId || 0),
+    sessionId: Number(params.sessionId || 0),
     app: params.app,
   }
 }

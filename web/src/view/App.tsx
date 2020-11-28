@@ -52,7 +52,7 @@ export function AppBody() {
         <Redirect noThrow from="app" to="index" />
         <Redirect noThrow from="app/playground" to="surveys" />
         <HomePage path={Route.HOME} />
-        <LecturesPage path={Route.LECTURES} />
+        <LecturesPage path={Route.LECTURES_NEW} />
         <ProjectsPage path={Route.PROJECTS} />
         <PlaygroundPage path={Route.PLAYGROUND} />
         <PlaygroundPage path={Route.PLAYGROUND_APP} />

@@ -26,6 +26,15 @@ import { toast } from '../toast/toast'
 import { fetchSurvey, fetchSurveys, subscribeSurveys } from './fetchSurveys'
 import { answerSurveyQuestion, nextSurveyQuestion } from './mutateSurveys'
 
+
+
+
+
+
+
+
+
+
 export function Surveys() {
   const location = useLocation()
   const [, surveyId] = (location.search || '').split('?surveyId=')
@@ -40,7 +49,6 @@ function SurveyList() {
   if (!data || data.surveys.length === 0) {
     return <div>no surveys</div>
   }
-//   console.log(data)
   return (
     <div className="mw6">
       {data.surveys.map((s, i) => (

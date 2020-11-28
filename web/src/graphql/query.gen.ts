@@ -344,6 +344,23 @@ export interface FetchSurveyVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: DeleteListeningSession
+// ====================================================
+
+export interface DeleteListeningSession {
+  deleteListeningSession: boolean;
+}
+
+export interface DeleteListeningSessionVariables {
+  sessionId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL mutation operation: CreateListeningSession
 // ====================================================
 
@@ -359,6 +376,23 @@ export interface CreateListeningSession {
 
 export interface CreateListeningSessionVariables {
   partyRockerId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: JoinListeningSession
+// ====================================================
+
+export interface JoinListeningSession {
+  joinListeningSession: boolean;
+}
+
+export interface JoinListeningSessionVariables {
+  input: JoinSessionInfo;
 }
 
 /* tslint:disable */
@@ -673,6 +707,11 @@ export interface SurveyQuestion {
 export enum UserType {
   ADMIN = "ADMIN",
   USER = "USER",
+}
+
+export interface JoinSessionInfo {
+  partyRockerId: number;
+  sessionId: number;
 }
 
 export interface PartyRockerInfo {

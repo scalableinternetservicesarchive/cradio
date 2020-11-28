@@ -2,6 +2,7 @@ import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
 import path from 'path'
 import { getManager } from 'typeorm'
+//import { getManager } from 'typeorm'
 import { check } from '../../../common/src/util'
 import { ListeningSession } from '../entities/ListeningSession'
 import { PartyRocker } from '../entities/PartyRocker'
@@ -31,7 +32,9 @@ export const graphqlRoot: Resolvers<Context> = {
   Query: {
     self: (_, args, ctx) => ctx.user,
     survey: async (_, { surveyId }) => (await Survey.findOne({ where: { id: surveyId } })) || null,
-    listeningSession: async (_, { sessionId }) => (await ListeningSession.findOne({ where: { id: sessionId }, relations: ['queue', 'owner', 'partyRockers'] })) || null,
+    listeningSession: async (_, { sessionId }) => { const result = await ListeningSession.findOne({ where: { id: sessionId }, relations: ['queue', 'owner', 'partyRockers'] })
+//     console.log("result", result)
+  return result || null},
     sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song']})) || null, //do we want this null???
     surveys: () => Survey.find(),
     partyRockers: async () => await PartyRocker.find(),
@@ -66,24 +69,25 @@ export const graphqlRoot: Resolvers<Context> = {
       const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
       const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song']}))
 
-
-
-
       const queueItem = new Queue()
       queueItem.score = 0
       queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
       queueItem.song = song
+     // console.log("listening session: ",listeningSession)
       queueItem.listeningSession = listeningSession
-      await queueItem.save()
+      //console.log("Queue Item", queueItem)
+      check(await queueItem.save())
 
-      //adding the queue item to the listneing session
-      console.log("listening session queue", listeningSession.queue)
-      listeningSession.queue.push(queueItem)
-      listeningSession.save()
+    // adding the queue item to the listneing session
+    //   console.log("listening session queue", listeningSession.queue)
+    //  listeningSession.queue.push(queueItem)
+    //  check(await listeningSession.save())
 
-      //incrementing length of listeningSession.queueLength
-      const entityManager = getManager();
-      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
+    //check this below, is this creating a race condition???
+    //  incrementing length of listeningSession.queueLength
+     const entityManager = getManager();
+     // change this to saving the entity above???
+     check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
 
 
       return true
@@ -99,7 +103,7 @@ export const graphqlRoot: Resolvers<Context> = {
     },
     createListeningSession: async (_, { partyRockerId }, ctx) => {
       const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
-      console.log(owner)
+//       console.log(owner)
 
       const listeningSession = new ListeningSession()
 
@@ -120,6 +124,28 @@ export const graphqlRoot: Resolvers<Context> = {
 
 
       return listeningSession
+    },
+    deleteListeningSession: async (_, { sessionId }, ctx) => {
+
+
+      const entityManager = getManager();
+      check(await entityManager.delete(ListeningSession, { id: sessionId }))
+
+      return true
+
+
+    },
+    joinListeningSession: async (_, { input }, ctx) => {
+      const { partyRockerId, sessionId } = input
+      const partyRocker = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
+      const listeningSession = check(await ListeningSession.findOne({ where: { id: sessionId }, relations: ['partyRockers']}))
+
+      listeningSession.partyRockers.push(partyRocker)
+
+      await listeningSession.save()
+      partyRocker.listeningSession = listeningSession
+      await partyRocker.save()
+      return true
     }
   },
   Subscription: {

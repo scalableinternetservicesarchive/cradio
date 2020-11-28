@@ -6,17 +6,25 @@ import {
   QueueInfo
 } from '../../graphql/query.gen'
 
-// const answerSurveyQuestionMutation = gql`
-//   mutation AnswerSurveyQuestion($input: SurveyInput!) {
-//     answerSurvey(input: $input)
-//   }
-// `
-
 const addToQueueMutation = gql`
   mutation AddToQueue($input: QueueInfo!) {
     addToQueue(input: $input)
   }
 `
+
+export function addToQueue(input: QueueInfo) {
+  return getApolloClient().mutate<AddToQueue, AddToQueueVariables>({
+    mutation: addToQueueMutation,
+    variables: { input },
+  })
+}
+
+
+// const answerSurveyQuestionMutation = gql`
+//   mutation AnswerSurveyQuestion($input: SurveyInput!) {
+//     answerSurvey(input: $input)
+//   }
+// `
 
 // mutation { addToQueue(input:1){
 //   id
@@ -31,10 +39,3 @@ const addToQueueMutation = gql`
 //     variables: { input },
 //   })
 // }
-
-export function addToQueue(input: QueueInfo) {
-  return getApolloClient().mutate<AddToQueue, AddToQueueVariables>({
-    mutation: addToQueueMutation,
-    variables: { input },
-  })
-}

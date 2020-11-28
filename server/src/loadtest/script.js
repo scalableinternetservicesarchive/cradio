@@ -1,5 +1,5 @@
 import http from 'k6/http'
-// import { sleep } from 'k6'
+import { sleep } from 'k6'
 import { Counter, Rate } from 'k6/metrics'
 
 export const options = {
@@ -52,7 +52,7 @@ function recordRates(res) {
     count200.add(1)
     rate200.add(1)
   } else if (res.status >= 300 && res.status < 400) {
-    console.log(res.body)
+//     console.log(res.body)
     count300.add(1)
     rate300.add(1)
   } else if (res.status >= 400 && res.status < 500) {
