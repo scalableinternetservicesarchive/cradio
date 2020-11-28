@@ -32,10 +32,10 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export function LecturesPage(props: LecturesPageProps) {
-  console.log('LecturesPages')
+//   console.log('LecturesPages')
   const idSession = Number(props.sessionId)
-  console.log('ID session from lecturePage')
-  console.log(idSession)
+//   console.log('ID session from lecturePage')
+//   console.log(idSession)
   const classes = useStyles()
   const [dense] = React.useState(false)
   const [songQueue, setQueue] = React.useState<Array<string>>([])
@@ -48,8 +48,8 @@ export function LecturesPage(props: LecturesPageProps) {
     variables: { sessionId: idSession },
   })
 
-  console.log(dataSongs)
-  console.log(sessionData)
+//   console.log(dataSongs)
+//   console.log(sessionData)
   if (loadingSession || loadingSongs) {
     return <div>loading...</div>
   }
@@ -71,7 +71,7 @@ export function LecturesPage(props: LecturesPageProps) {
                   <ListItemIcon>
                     <AddIcon
                       onClick={() => {
-                        console.log(currSong)
+//                         console.log(currSong)
                         setQueue(current => [...current, currSong.name])
                         addToQueue({ songId: currSong.id, listeningSessionId: idSession })
                       }}
