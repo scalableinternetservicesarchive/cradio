@@ -16,7 +16,7 @@ import { fetchSongs } from '../playground/fetchSong'
 import { addToQueue } from '../playground/mutateQueue'
 import { Page } from './Page'
 
-interface LecturesPageProps extends RouteComponentProps, AppRouteParams {}
+interface LecturesPageProps extends RouteComponentProps, AppRouteParams { }
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,24 +32,25 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export function LecturesPage(props: LecturesPageProps) {
-//   console.log('LecturesPages')
+  //   console.log('LecturesPages')
   const idSession = Number(props.sessionId)
-//   console.log('ID session from lecturePage')
-//   console.log(idSession)
+  //   console.log('ID session from lecturePage')
+  //   console.log(idSession)
   const classes = useStyles()
   const [dense] = React.useState(false)
   const [songQueue, setQueue] = React.useState<Array<string>>([])
   const [secondary] = React.useState(false)
   const { loading: loadingSongs, data: dataSongs } = useQuery<FetchSongs>(fetchSongs)
-  const { loading: loadingSession, data: sessionData } = useQuery<
+  // add `data: sessionData` to `const { loading: loadingSession }` on line 45 if you want to use the console.log on line 53.
+  const { loading: loadingSession } = useQuery<
     FetchListeningSession,
     FetchListeningSessionVariables
   >(fetchListeningSession, {
     variables: { sessionId: idSession },
   })
 
-//   console.log(dataSongs)
-//   console.log(sessionData)
+  //   console.log(dataSongs)
+  //   console.log(sessionData)
   if (loadingSession || loadingSongs) {
     return <div>loading...</div>
   }
@@ -71,7 +72,7 @@ export function LecturesPage(props: LecturesPageProps) {
                   <ListItemIcon>
                     <AddIcon
                       onClick={() => {
-//                         console.log(currSong)
+                        //                         console.log(currSong)
                         setQueue(current => [...current, currSong.name])
                         addToQueue({ songId: currSong.id, listeningSessionId: idSession })
                       }}
