@@ -13,6 +13,7 @@ bundle-graphiql.js*
 .vscode/.react
 
 # terraform
+terraform/
 .terraform/
 .terraform*
 terraform.tfstate.backup
