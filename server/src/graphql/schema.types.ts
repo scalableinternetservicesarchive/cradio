@@ -1,6 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
   { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
@@ -54,6 +56,7 @@ export interface Mutation {
   createListeningSession: ListeningSession
   joinListeningSession: Scalars['Boolean']
   deleteListeningSession: Scalars['Boolean']
+  deletePartyRocker: Scalars['Boolean']
 }
 
 export interface MutationAnswerSurveyArgs {
@@ -82,6 +85,10 @@ export interface MutationJoinListeningSessionArgs {
 
 export interface MutationDeleteListeningSessionArgs {
   sessionId: Scalars['Int']
+}
+
+export interface MutationDeletePartyRockerArgs {
+  partyRockerId: Scalars['Int']
 }
 
 export interface Subscription {
@@ -392,6 +399,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteListeningSessionArgs, 'sessionId'>
+  >
+  deletePartyRocker?: Resolver<
+    ResolversTypes['Boolean'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeletePartyRockerArgs, 'partyRockerId'>
   >
 }
 
