@@ -14,7 +14,6 @@ export const fragmentQueue = gql`
     listeningSession {
       id
     }
-
   }
 `
 
