@@ -63,7 +63,7 @@ export default function (data) {
   // recordRates(
 
   const sleepTime = Math.floor(Math.random() * Math.floor(20)) + 1
-  console.log('sleeping for: ', sleepTime)
+//   console.log('sleeping for: ', sleepTime)
   sleep(sleepTime)
 
   //we want to queue a "random" song out of the list of songs instead of queueing the same song every time
@@ -114,7 +114,7 @@ function recordRates(res) {
     count200.add(1)
     rate200.add(1)
   } else if (res.status >= 300 && res.status < 400) {
-    console.log(res.body)
+//     console.log(res.body)
     count300.add(1)
     rate300.add(1)
   } else if (res.status >= 400 && res.status < 500) {

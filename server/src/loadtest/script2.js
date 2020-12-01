@@ -12,16 +12,20 @@ export const options = {
         { target: 500, duration: '60s' },
         { target: 0, duration: '60s' },
       ],
-      gracefulRampDown: '0s',
+      gracefulRampDown: '90s',
     },
   },
 }
 
+const partyRockerCreation_Success = new Counter('PartyRocker_Creation_Success')
+const listeningSessionCreation_Success = new Counter('ListeningSession_Creation_Success')
+const addToQueue_Success = new Counter('AddToQueue_Creation_Success')
+
 export default function () {
   // recordRates(
-  // const resp =
+
   const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
-  http.post(
+  const mainPartyRocker = http.post(
     'http://localhost:3000/graphql',
     //'{"operationName":"CreatePartyRocker","variables":{"input":{"name":"${String(__VU)}"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker/////(input: $input) { \\n id }}"}',
     nameGen,
@@ -31,21 +35,68 @@ export default function () {
       },
     }
   )
-  sleep(Math.random(3));
-  const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + String(__VU) + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
-  http.post(
-    'http://localhost:3000/graphql',
-    sessGen,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+
+  //console.log('iteration: ', i++, ' body: ', mainPartyRocker.body)
+
+  if (mainPartyRocker.status >= 200 && mainPartyRocker.status < 300) {
+    partyRockerCreation_Success.add(1)
+    const partyRockerId = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
+    // console.log("party rocker: ", partyRockerId)
+
+    sleep(Math.random(3));
+
+    const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + partyRockerId + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
+    const mainSession = http.post(
+      'http://localhost:3000/graphql',
+      sessGen,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    sleep(Math.random(3));
+
+    // if (typeof mainSession !== 'undefined') {
+    if (mainSession.status >= 200 && mainSession.status < 300) {
+      listeningSessionCreation_Success.add(1)
+
+      const listeningSessionID = JSON.parse(mainSession.body).data.createListeningSession.id
+      // console.log("session creation: " , mainSession.status)
+
+      // const listeningSessionId = mainSession.body.match(/[1-9][0-9]*/)
+
+      const queueGen = '{"operationName":"AddToQueue","variables":{"input":{"songId":'+ String(Math.floor((Math.random()*5)+1)) +', "listeningSessionId":' + String(listeningSessionID) +'}},"query":"  mutation AddToQueue($input: QueueInfo!) { \\n addToQueue(input: $input) \\n}"}'
+      const addToQueueWorked = http.post(
+        'http://localhost:3000/graphql',
+        queueGen,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      // if (typeof addToQueueWorked !== 'undefined') {
+      if (addToQueueWorked.status >= 200 && addToQueueWorked.status < 300) {
+        addToQueue_Success.add(1)
+      }
     }
-  )
-  // )
-  /*sleep(1)
-  http.get('http://localhost:3000')*/
+
+  // const didAddToQueueWork = JSON.parse(addToQueueWorked.body).data.addToQueue
+  // console.log("adding to queue: ", didAddToQueueWork)
+  // console.log("adding to queue: ", didAddToQueueWork, " sessionID: ", listeningSessionID )
+
+  }
+  // http.get('http://localhost:3000')
 }
+
+// export function teardown() {
+
+
+
+// }
 
 const count200 = new Counter('status_code_2xx')
 const count300 = new Counter('status_code_3xx')
@@ -62,7 +113,7 @@ function recordRates(res) {
     count200.add(1)
     rate200.add(1)
   } else if (res.status >= 300 && res.status < 400) {
-    console.log(res.body)
+//     console.log(res.body)
     count300.add(1)
     rate300.add(1)
   } else if (res.status >= 400 && res.status < 500) {

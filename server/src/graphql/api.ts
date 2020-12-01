@@ -79,9 +79,9 @@ export const graphqlRoot: Resolvers<Context> = {
       check(await queueItem.save())
 
     //adding the queue item to the listneing session
-      console.log("listening session queue", listeningSession.queue)
-     listeningSession.queue.push(queueItem)
-     check(await listeningSession.save())
+    //   console.log("listening session queue", listeningSession.queue)
+    //  listeningSession.queue.push(queueItem)
+    //  check(await listeningSession.save())
 
     //check this below, is this creating a race condition???
     //  incrementing length of listeningSession.queueLength
@@ -103,7 +103,7 @@ export const graphqlRoot: Resolvers<Context> = {
     },
     createListeningSession: async (_, { partyRockerId }, ctx) => {
       const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
-      console.log(owner)
+//       console.log(owner)
 
       const listeningSession = new ListeningSession()
 
