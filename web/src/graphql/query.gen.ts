@@ -53,40 +53,12 @@ export interface FetchListeningSession_listeningSession_partyRockers {
   listeningSession: FetchListeningSession_listeningSession_partyRockers_listeningSession | null;
 }
 
-export interface FetchListeningSession_listeningSession_queue_song_artist {
-  __typename: "Artist";
-  name: string;
-}
-
-export interface FetchListeningSession_listeningSession_queue_song {
-  __typename: "Song";
-  name: string;
-  genre: string;
-  duration: number;
-  artist: FetchListeningSession_listeningSession_queue_song_artist;
-}
-
-export interface FetchListeningSession_listeningSession_queue_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-}
-
-export interface FetchListeningSession_listeningSession_queue {
-  __typename: "Queue";
-  id: number;
-  score: number;
-  position: number;
-  song: FetchListeningSession_listeningSession_queue_song;
-  listeningSession: FetchListeningSession_listeningSession_queue_listeningSession;
-}
-
 export interface FetchListeningSession_listeningSession {
   __typename: "ListeningSession";
   id: number;
   timeCreated: number;
   owner: FetchListeningSession_listeningSession_owner;
   partyRockers: FetchListeningSession_listeningSession_partyRockers[];
-  queue: FetchListeningSession_listeningSession_queue[] | null;
 }
 
 export interface FetchListeningSession {
@@ -525,40 +497,12 @@ export interface ListeningSession_partyRockers {
   listeningSession: ListeningSession_partyRockers_listeningSession | null;
 }
 
-export interface ListeningSession_queue_song_artist {
-  __typename: "Artist";
-  name: string;
-}
-
-export interface ListeningSession_queue_song {
-  __typename: "Song";
-  name: string;
-  genre: string;
-  duration: number;
-  artist: ListeningSession_queue_song_artist;
-}
-
-export interface ListeningSession_queue_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-}
-
-export interface ListeningSession_queue {
-  __typename: "Queue";
-  id: number;
-  score: number;
-  position: number;
-  song: ListeningSession_queue_song;
-  listeningSession: ListeningSession_queue_listeningSession;
-}
-
 export interface ListeningSession {
   __typename: "ListeningSession";
   id: number;
   timeCreated: number;
   owner: ListeningSession_owner;
   partyRockers: ListeningSession_partyRockers[];
-  queue: ListeningSession_queue[] | null;
 }
 
 /* tslint:disable */

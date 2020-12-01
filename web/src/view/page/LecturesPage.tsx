@@ -49,7 +49,10 @@ export function LecturesPage(props: LecturesPageProps) {
   })
 
   console.log(dataSongs)
-  console.log(sessionData)
+ //console.log(sessionData)
+
+  React.useEffect(() =>{console.log("session Data", sessionData)}, [sessionData]
+  );
   if (loadingSession || loadingSongs) {
     return <div>loading...</div>
   }

@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 import { fragmentPartyRocker } from './fetchPartyRocker'
-import { fragmentQueue } from './fetchQueue'
+//import { fragmentQueue } from './fetchQueue'
 
 export const fragmentListeningSession = gql`
   fragment ListeningSession on ListeningSession {
@@ -12,9 +12,6 @@ export const fragmentListeningSession = gql`
     }
     partyRockers {
       ...PartyRocker
-    }
-    queue {
-      ...Queue
     }
   }
 `
@@ -28,7 +25,6 @@ export const fetchListeningSession = gql`
   }
   ${fragmentListeningSession}
   ${fragmentPartyRocker}
-  ${fragmentQueue}
 `
 
 // export const subscribeSurveys = gql`
