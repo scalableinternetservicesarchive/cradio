@@ -35,7 +35,7 @@ export const graphqlRoot: Resolvers<Context> = {
     listeningSession: async (_, { sessionId }) => { const result = await ListeningSession.findOne({ where: { id: sessionId }, relations: ['owner', 'partyRockers'] })
     console.log("result", result)
   return result || null},
-    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song']})) || null, //do we want this null???
+    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song', 'listeningSession']})) || null, //do we want this null???
     surveys: () => Survey.find(),
     partyRockers: async () => await PartyRocker.find(),
     songs: async () => await Song.find({relations: ['artist']}),
