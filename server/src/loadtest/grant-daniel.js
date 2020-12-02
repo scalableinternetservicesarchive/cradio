@@ -3,16 +3,14 @@ import { sleep } from 'k6'
 import { Counter, Rate } from 'k6/metrics'
 
 export const options = {
-  scenarios: {
     scenarios: {
       contacts: {
         executor: 'per-vu-iterations', //500 iterators each running the function once
         vus: 500,
         iterations: 1,
-        maxDuration: '60s',
+        maxDuration: '0h2m',
       },
     },
-  }
 }
 
 const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
