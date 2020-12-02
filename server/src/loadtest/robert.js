@@ -114,7 +114,8 @@ export function teardown() {
 
   //console.log(totalEntries)
   //delete the party rockers
-  for (let i = 1; i < totalEntries+1; i++) {
+  /*for (let i = 1; i < totalEntries+1; i++) {
+    console.log(i)
     const deleteUser = http.post(
       'http://localhost:3000/graphql',
       '{"operationName":"DeletePartyRocker","variables":{"partyRockerId":' + i + '},"query":"mutation DeletePartyRocker($partyRockerId: Int!) { \\n deletePartyRocker(partyRockerId: $partyRockerId)}"}',
@@ -125,9 +126,9 @@ export function teardown() {
       }
     )
     console.log(deleteUser.status)
+    console.log(deleteUser.body)
 
-  }
-
+  }*/
   //delete the listensing sessions (and therefore the related queue)
   for (let i = 1; i < totalEntries+1; i++) {
     const deleteSession = http.post(
@@ -139,9 +140,20 @@ export function teardown() {
         },
       }
     )
-    console.log(deleteSession.status)
-
+    //console.log(deleteSession.status)
+    console.log(deleteSession.body)
   }
+
+  /*const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
+  const mainPartyRocker = http.post(
+    'http://localhost:3000/graphql',
+    nameGen,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )*/
   console.log("Done deleting everything!")
 }
 
