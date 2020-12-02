@@ -9,14 +9,21 @@ import Typography from '@material-ui/core/Typography'
 import AddIcon from '@material-ui/icons/Add'
 import { RouteComponentProps } from '@reach/router'
 import * as React from 'react'
-import { FetchListeningSession, FetchListeningSessionVariables, FetchSongs } from '../../graphql/query.gen'
+import {
+  FetchListeningSession,
+  FetchListeningSessionVariables,
+  FetchQueue,
+  FetchQueueVariables,
+  FetchSongs,
+} from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
+import { fetchQueue } from '../playground/fetchQueue'
 import { fetchSongs } from '../playground/fetchSong'
 import { addToQueue } from '../playground/mutateQueue'
 import { Page } from './Page'
 
-interface LecturesPageProps extends RouteComponentProps, AppRouteParams { }
+interface LecturesPageProps extends RouteComponentProps, AppRouteParams {}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,31 +39,41 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export function LecturesPage(props: LecturesPageProps) {
-  //   console.log('LecturesPages')
   const idSession = Number(props.sessionId)
-  //   console.log('ID session from lecturePage')
-  //   console.log(idSession)
   const classes = useStyles()
   const [dense] = React.useState(false)
   const [songQueue, setQueue] = React.useState<Array<string>>([])
   const [secondary] = React.useState(false)
   const { loading: loadingSongs, data: dataSongs } = useQuery<FetchSongs>(fetchSongs)
   // add `data: sessionData` to `const { loading: loadingSession }` on line 45 if you want to use the console.log on line 53.
-  const { loading: loadingSession } = useQuery<
-    FetchListeningSession,
-    FetchListeningSessionVariables
-  >(fetchListeningSession, {
+  const { loading: loadingSession } = useQuery<FetchListeningSession, FetchListeningSessionVariables>(
+    fetchListeningSession,
+    {
+      variables: { sessionId: idSession },
+    }
+  )
+
+  //console.log(dataSongs)
+  // console.log(sessionData)
+  const { loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
     variables: { sessionId: idSession },
   })
+  console.log(queueData)
 
-  //   console.log(dataSongs)
-  //   console.log(sessionData)
-  if (loadingSession || loadingSongs) {
+  // React.useEffect(() =>{console.log("session Data", sessionData)}, [sessionData]
+  // );
+  if (loadingSession || loadingSongs || loadingQueue) {
     return <div>loading...</div>
   }
   if (!dataSongs || dataSongs.songs.length === 0) {
     return <div>no songs</div>
   }
+
+  // if (queueData) {
+  //   {
+  //     queueData!.sessionQueue.map((currSong, index) => setQueue(current => [...current, currSong.song.name]))
+  //   }
+  // }
 
   return (
     <Page>
@@ -67,12 +84,11 @@ export function LecturesPage(props: LecturesPageProps) {
           </Typography>
           <div className={classes.demo}>
             <List dense={dense}>
-              {dataSongs.songs.map(currSong => (
-                <ListItem>
+              {dataSongs.songs.map((currSong, index) => (
+                <ListItem key={index}>
                   <ListItemIcon>
                     <AddIcon
                       onClick={() => {
-                        //                         console.log(currSong)
                         setQueue(current => [...current, currSong.name])
                         addToQueue({ songId: currSong.id, listeningSessionId: idSession })
                       }}
@@ -90,8 +106,13 @@ export function LecturesPage(props: LecturesPageProps) {
           </Typography>
           <div className={classes.demo}>
             <List dense={dense}>
-              {songQueue.map(currSong => (
-                <ListItem>
+              {queueData!.sessionQueue.map((currSong, index) => (
+                <ListItem key={index}>
+                  <ListItemText primary={currSong.song.name} secondary={secondary ? 'Secondary text' : null} />
+                </ListItem>
+              ))}
+              {songQueue.map((currSong, index) => (
+                <ListItem key={index}>
                   <ListItemText primary={currSong} secondary={secondary ? 'Secondary text' : null} />
                 </ListItem>
               ))}

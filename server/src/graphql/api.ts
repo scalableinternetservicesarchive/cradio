@@ -32,10 +32,10 @@ export const graphqlRoot: Resolvers<Context> = {
   Query: {
     self: (_, args, ctx) => ctx.user,
     survey: async (_, { surveyId }) => (await Survey.findOne({ where: { id: surveyId } })) || null,
-    listeningSession: async (_, { sessionId }) => { const result = await ListeningSession.findOne({ where: { id: sessionId }, relations: ['queue', 'owner', 'partyRockers'] })
-//     console.log("result", result)
+    listeningSession: async (_, { sessionId }) => { const result = await ListeningSession.findOne({ where: { id: sessionId }, relations: ['owner', 'partyRockers'] })
+    console.log("result", result)
   return result || null},
-    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song']})) || null, //do we want this null???
+    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song', 'listeningSession']})) || null, //do we want this null???
     surveys: () => Survey.find(),
     partyRockers: async () => await PartyRocker.find(),
     songs: async () => await Song.find({relations: ['artist']}),
@@ -78,7 +78,7 @@ export const graphqlRoot: Resolvers<Context> = {
       //console.log("Queue Item", queueItem)
       check(await queueItem.save())
 
-    // adding the queue item to the listneing session
+    //adding the queue item to the listneing session
     //   console.log("listening session queue", listeningSession.queue)
     //  listeningSession.queue.push(queueItem)
     //  check(await listeningSession.save())
