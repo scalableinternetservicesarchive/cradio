@@ -2,11 +2,8 @@ import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
 import Redis from 'ioredis'
 import path from 'path'
-import { getManager } from 'typeorm'
 //import { getManager } from 'typeorm'
 import { check } from '../../../common/src/util'
-import { ListeningSession } from '../entities/ListeningSession'
-import { PartyRocker } from '../entities/PartyRocker'
 import { Queue } from '../entities/Queue'
 import { Song } from '../entities/Song'
 import { Survey } from '../entities/Survey'
@@ -58,7 +55,7 @@ export const graphqlRoot: Resolvers<Context> = {
   return result as any || null},
     sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song', 'listeningSession']})) || null, //do we want this null???
     surveys: () => Survey.find(),
-    partyRockers: async () => await PartyRocker.find(),
+    //partyRockers: async () => await PartyRocker.find(), //does anyone use this??
     songs: async () => await Song.find({relations: ['artist']}),
     song: async (_, { songName }) => (await Song.find({ where: { name: songName }, relations: ['artist'] }))
   },
@@ -120,7 +117,7 @@ export const graphqlRoot: Resolvers<Context> = {
      console.log("queue length", listeningSessionQueueLength) //ADD ERROR CHECK HERE ?
      const queueLength = Number(listeningSessionQueueLength[0])
 
-     const numQueueItems= await redis.incr("numQueueItems") //Incrementer to use for a unique id
+     const numQueueItems= await redis.incr("numQueueItems") //Incrementer to use for a unique id, race conditions???
      const response = await redis.hmset(`queueItem:${numQueueItems}`, "id", numQueueItems, "score", 0, "position", queueLength + 1) //should i store for song and listening session here??
 
      if (response != "OK"){
@@ -132,6 +129,10 @@ export const graphqlRoot: Resolvers<Context> = {
       return false
     }
 
+    const updateQueueLenResult = await redis.hincrby(`listeningSession:${listeningSessionId}`, "queueLength", 1)
+    if (updateQueueLenResult == queueLength){
+      return false
+    }
       return true
     },
     createPartyRocker: async (_, { input }, {redis}) => {
@@ -156,21 +157,25 @@ export const graphqlRoot: Resolvers<Context> = {
       const partyRockerOwner = await redis.hmget(`partyRocker:${partyRockerId}`, "id")
       console.log("owner id from redis", partyRockerOwner)
       //let ownerId:Number;
-      if (partyRockerOwner === undefined || partyRockerOwner.length == 0) {
+      if (partyRockerOwner === undefined || partyRockerOwner[0] == null) {
         // array empty or does not exist
           console.log("party rocker does not exist, need an owner for the session")
+          throw new Error("Party Rocker with that ID does not exist")
           //add error check here!
       }
       const ownerId = Number(partyRockerOwner[0]);
       const secondsSinceEpoch = Math.round(Date.now() / 1000)
       const numListeningSessions = await redis.incr("numListeningSessions")
-      const listeningSessionRedis = await redis.hmset(`listeningSession:${numListeningSessions}`, "id", numListeningSessions, "timeCreated", secondsSinceEpoch, "owner", ownerId)
+
+      const listeningSession = {id: numListeningSessions, timeCreated: secondsSinceEpoch, queueLength: 0, owner: ownerId}
+
+      const listeningSessionRedis = await redis.hmset(`listeningSession:${numListeningSessions}`, listeningSession)
       console.log("session creation result", listeningSessionRedis)
       const listeningSessionResult = await redis.hgetall(`listeningSession:${numListeningSessions}`)
       console.log("creation result", listeningSessionResult)
 
 
-      const listeningSession = {id: numListeningSessions, timeCreated: secondsSinceEpoch, queueLength: 0, owner: ownerId} //do i need to return an empty list here for queue?? what about party rockers?? will the resolvers handle this if i omit those??
+      //const listeningSession = {id: numListeningSessions, timeCreated: secondsSinceEpoch, queueLength: 0, owner: ownerId} //do i need to return an empty list here for queue?? what about party rockers?? will the resolvers handle this if i omit those??
 
 
       // const listeningSession = new ListeningSession()
@@ -193,11 +198,24 @@ export const graphqlRoot: Resolvers<Context> = {
       return listeningSession as any
       //return listeningSessionResult
     },
-    deleteListeningSession: async (_, { sessionId }, ctx) => {
+    deleteListeningSession: async (_, { sessionId }, {redis}) => {
 
 
-      const entityManager = getManager();
-      check(await entityManager.delete(ListeningSession, { id: sessionId }))
+      // const entityManager = getManager();
+      // check(await entityManager.delete(ListeningSession, { id: sessionId }))
+
+      const queueItemIds = await redis.smembers(`listeningSession:${sessionId}:queue`)
+      queueItemIds.forEach(async queueItemId => { const queueItemDelete = await redis.del(`queueItem:${queueItemId}`)
+         console.log("queue item delete result: ", queueItemDelete)}
+        )
+
+      const deleteQueueResult = await redis.del(`listeningSession:${sessionId}:queue`)
+      console.log("number of keys removed ", deleteQueueResult)
+
+      const deleteSessionResult = await redis.del(`listeningSession:${sessionId}`)
+      if (deleteSessionResult <=0 ){
+       return false
+      }
 
       return true
 
@@ -238,10 +256,15 @@ export const graphqlRoot: Resolvers<Context> = {
   ListeningSession: {
     async queue(parent, args, {redis})  {
       const queueItemIds = await redis.smembers(`listeningSession:${parent.id}:queue`)
-      let result: any[] = [] //what to do about this???
+      const result: any[] = []
       queueItemIds.forEach(async queueItemId => { const queueItem = await redis.hgetall(`queueItem:${queueItemId}`)
-        result.push(queueItem)})
-      console.log("queue item searh result: ", result)
+         result.push(queueItem)
+         console.log("queue item searh result: ", queueItem)}
+        )
+
+      // const promises = queueItemIds.map(async (item, index) => {  redis.hgetall(`queueItem:${item}`)})
+      // const queueItems = await Promise.all(promises)
+      // console.log("queue items result", queueItems)
       return result
 
     },
@@ -249,6 +272,7 @@ export const graphqlRoot: Resolvers<Context> = {
       const partyRockerIds = await redis.smembers(`listeningSession:${parent.id}:partyRockers`)
       let result: any[] = [] //what to do about this???
       partyRockerIds.forEach(async partyRockerId => { const partyRocker = await redis.hgetall(`partyRocker:${partyRockerId}`)
+      console.log("party rocker to add to list: ", partyRocker)
         result.push(partyRocker)})
       return result
 
