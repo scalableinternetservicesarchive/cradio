@@ -16,7 +16,22 @@ import { User } from '../entities/User'
 import { Resolvers } from './schema.types'
 
 
+//Redis "Schema":
 
+//entity for each indicivual queue item  (ID here is a unique id for the queue item)
+// queue:<ID> {  }
+
+//entity for each listening session (key)
+// listeningSession:<listeningSessionId> {….}
+
+//Entity for each queue (a set of queue ids) the key includes the listening session id
+// listeningSession:<listeningSessionId>:queue set([id1, id2, …. ])
+
+ //entity for each indicivual party rocker  (ID here is a unique id for the queue item)
+// Party rocker:<ID> {  }
+
+ //Entity for each list of party rockers within a queue (a set of party rocke ids) the key includes the listening session id
+// listeningSession:<listeningSessionId>:partyRockers set([id1, id2, …. ])
 
 export const pubsub = new PubSub()
 export const my_redis = new Redis()
@@ -102,10 +117,7 @@ export const graphqlRoot: Resolvers<Context> = {
       const { name } = input
 
       const numPartyRockers = await redis.incr("numPartyRockers")
-
-
       const response = redis.hmset(`partyRocker:${numPartyRockers}`, "id", numPartyRockers, "name", name) //should i store empty strings here??
-
       console.log("hmset response", response)
       const partyRocker = new PartyRocker()
       partyRocker.name = name
@@ -113,29 +125,50 @@ export const graphqlRoot: Resolvers<Context> = {
 
       return partyRocker
     },
-    createListeningSession: async (_, { partyRockerId }, ctx) => {
-      const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
+    createListeningSession: async (_, { partyRockerId }, {redis}) => {
+      //const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
 //       console.log(owner)
 
-      const listeningSession = new ListeningSession()
 
-      listeningSession.owner = owner
-      listeningSession.timeCreated = Math.round(Date.now() / 1000)
-      listeningSession.queueLength = 0
-      listeningSession.partyRockers = []
-      listeningSession.partyRockers.push(owner)
-      listeningSession.queue = []
+      const partyRockerOwner = await redis.hmget(`partyRocker:${partyRockerId}`, "id")
+      console.log("owner id from redis", partyRockerOwner)
+      //let ownerId:Number;
+      if (partyRockerOwner === undefined || partyRockerOwner.length == 0) {
+        // array empty or does not exist
+          console.log("party rocker does not exist, need an owner for the session")
+          //add error check here!
+      }
+      const ownerId = Number(partyRockerOwner[0]);
+      const secondsSinceEpoch = Math.round(Date.now() / 1000)
+      const numListeningSessions = await redis.incr("numListeningSessions")
+      const listeningSessionRedis = await redis.hmset(`listeningSession:${numListeningSessions}`, "id", numListeningSessions, "timeCreated", secondsSinceEpoch, "owner", ownerId)
+      console.log("session creation result", listeningSessionRedis)
+      const listeningSessionResult = await redis.hgetall(`listeningSession:${numListeningSessions}`)
+      console.log("creation result", listeningSessionResult)
+
+
+      const listeningSession = {id: numListeningSessions, timeCreated: secondsSinceEpoch, queueLength: 0, owner: ownerId, partyRockers: [ownerId], queue: []} //do i need to return an empty list here for queue?? what about party rockers?? wont the resolvers handle this??
+
+
+      // const listeningSession = new ListeningSession()
+      // listeningSession.owner = owner
+      // listeningSession.timeCreated = Math.round(Date.now() / 1000)
+      // listeningSession.queueLength = 0
+      // listeningSession.partyRockers = []
+      // listeningSession.partyRockers.push(owner)
+      // listeningSession.queue = []
 
 
 
-      await listeningSession.save()
+      // await listeningSession.save()
 
 
-      owner.listeningSession = listeningSession
-      await owner.save()
+      // owner.listeningSession = listeningSession
+      // await owner.save()
 
 
-      return listeningSession
+      return listeningSession as any
+      //return listeningSessionResult
     },
     deleteListeningSession: async (_, { sessionId }, ctx) => {
 
@@ -158,6 +191,16 @@ export const graphqlRoot: Resolvers<Context> = {
       partyRocker.listeningSession = listeningSession
       await partyRocker.save()
       return true
+    }
+  },
+  ListeningSession: {
+    async queue(parent, args, {redis})  {
+      const queueItemIds = await redis.smembers(`listeningSession:${parent.id}:queue`)
+      let result: any[] = [] //what to do about this???
+      queueItemIds.forEach(async queueItemId => { const queueItem = await redis.hgetall(`queueItem:${queueItemId}`)
+        result.push(queueItem)})
+      return result
+
     }
   },
   Subscription: {
