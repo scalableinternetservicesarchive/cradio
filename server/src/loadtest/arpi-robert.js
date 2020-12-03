@@ -2,8 +2,8 @@ import http from 'k6/http'
 import { sleep } from 'k6'
 import { Counter, Rate } from 'k6/metrics'
 
-const numOfVus = 5
-const numOfIterations = 2
+const numOfVus = 50
+const numOfIterations = 3
 export const options = {
   scenarios: {
     manyUsers: {
@@ -21,35 +21,40 @@ const partyRockerCreation_Success = new Counter('PartyRocker_Creation_Success')
 const listeningSessionCreation_Success = new Counter('ListeningSession_Creation_Success')
 const addToQueue_Success = new Counter('AddToQueue_Creation_Success')
 
-//let partyRockerIds = []
-//let listeningSessionIds = []
-
-export default function () {
-  // recordRates(
-
-  const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
-  const mainPartyRocker = http.post(
-    'http://localhost:3000/graphql',
-    nameGen,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+export function setup() {
+  //Create party rocker so that you can create a listneing session with them as the owner
+  let partyRockerIds = []
+  for(let i = 1;i<totalEntries+1;i++){
+    const mainPartyRocker = http.post(
+      'http://localhost:3000/graphql',
+      '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"Rocker ' + i + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}',
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    if (mainPartyRocker.body.length === 0){
+      console.log('No response body for party rocker creation received')
     }
-  )
-
-  if (mainPartyRocker.body.length === 0){
-    console.log('No response body for party rocker creation received')
+    else if (mainPartyRocker.status >= 200 && mainPartyRocker.status < 300) {
+      partyRockerCreation_Success.add(1)
+      partyRockerIds.push(JSON.parse(mainPartyRocker.body).data.createPartyRocker.id)
+    }
+    else{
+      console.log('Party Rocker Creation Not Successful - Status: ' + mainPartyRocker.status)
+    }
   }
-  else if (mainPartyRocker.status >= 200 && mainPartyRocker.status < 300) {
-    partyRockerCreation_Success.add(1)
-    const partyRockerId = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
-    //partyRockerIds.push(partyRockerId)
-    //console.log(partyRockerIds.length)
+  return { partyRockerIdArray: partyRockerIds }
+}
+
+
+export default function (data) {
 
     sleep(Math.random(3));
 
-    const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + partyRockerId + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
+    let partyRockerIndex = (__VU + __ITER * numOfVus)-1
+    const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + data.partyRockerIdArray[partyRockerIndex] + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
     const mainSession = http.post(
       'http://localhost:3000/graphql',
       sessGen,
@@ -67,11 +72,7 @@ export default function () {
     }
     else if (mainSession.status >= 200 && mainSession.status < 300) {
       listeningSessionCreation_Success.add(1)
-
       const listeningSessionID = JSON.parse(mainSession.body).data.createListeningSession.id
-      //listeningSessionIds.push(listeningSessionID)
-      // console.log("session creation: " , mainSession.status)
-
       const queueGen = '{"operationName":"AddToQueue","variables":{"input":{"songId":'+ String(Math.floor((Math.random()*5)+1)) +', "listeningSessionId":' + String(listeningSessionID) +'}},"query":"  mutation AddToQueue($input: QueueInfo!) { \\n addToQueue(input: $input) \\n}"}'
       const addToQueueWorked = http.post(
         'http://localhost:3000/graphql',
@@ -91,61 +92,45 @@ export default function () {
       }
 
       else{
-        console.log('Queue Creation Status: ' + addToQueueWorked.status)
+        console.log('Queue Creation Not Successful - Status: ' + addToQueueWorked.status)
       }
     }
     else{
-      console.log('Session Creation Status: ' + mainSession.status)
+      console.log('Session Creation Not Successful - Status: ' + mainSession.status)
     }
-
-  // const didAddToQueueWork = JSON.parse(addToQueueWorked.body).data.addToQueue
-  // console.log("adding to queue: ", didAddToQueueWork)
-  // console.log("adding to queue: ", didAddToQueueWork, " sessionID: ", listeningSessionID )
-
-  }
-  else{
-    console.log('Party Rocker Creation Status: ' + mainPartyRocker.status)
-  }
-  // http.get('http://localhost:3000')
 }
 
 
-export function teardown() {
+export function teardown(data) {
 
-  //console.log(totalEntries)
+  let deleteCounter = 0;
   //delete the party rockers
-  for (let i = 1; i < totalEntries+1; i++) {
-    console.log(i)
+  for (let i = 0; i < totalEntries; i++) {
+    let printId = data.partyRockerIdArray[i]
     const deleteUser = http.post(
       'http://localhost:3000/graphql',
-      '{"operationName":"DeletePartyRocker","variables":{"partyRockerId":' + i + '},"query":"mutation DeletePartyRocker($partyRockerId: Int!) { \\n deletePartyRocker(partyRockerId: $partyRockerId)}"}',
+      '{"operationName":"DeletePartyRocker","variables":{"partyRockerId":' + printId + '},"query":"mutation DeletePartyRocker($partyRockerId: Int!) { \\n deletePartyRocker(partyRockerId: $partyRockerId)}"}',
       {
         headers: {
           'Content-Type': 'application/json',
         },
       }
     )
-    //console.log(deleteUser.status)
-    //console.log(deleteUser.body)
-
+    if(deleteUser.status == 200){
+      deleteCounter++;
+    }
+    else{
+      console.log("Could not delete Party Rocker with id: " + printId)
+    }
   }
-  //delete the listensing sessions (and therefore the related queue)
-  /*for (let i = 1; i < totalEntries+1; i++) {
-    const deleteSession = http.post(
-      'http://localhost:3000/graphql',
-      '{"operationName":"DeleteListeningSession","variables":{"sessionId":' + i + '},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}',
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
-    //console.log(deleteSession.status)
-    console.log(deleteSession.body)
-  }*/
+
+  if(deleteCounter == totalEntries){
+    console.log("All entries deleted successfully!")
+  }
+  else{
+    console.log("Did not successfully delete all entries!")
+  }
 }
-
-
 
 const count200 = new Counter('status_code_2xx')
 const count300 = new Counter('status_code_3xx')

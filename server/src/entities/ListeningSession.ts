@@ -20,8 +20,8 @@ export class ListeningSession extends BaseEntity {
   @JoinColumn()
   owner: PartyRocker
 
-  //@OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession, {cascade:true, onDelete: 'CASCADE' })
-  @OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession)
+  @OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession, {cascade:true})
+  //@OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession)
   partyRockers: PartyRocker[]
 
   @OneToMany(type => Queue, queue => queue.listeningSession)
