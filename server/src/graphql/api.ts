@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
+import Redis from 'ioredis'
 import path from 'path'
 import { getManager } from 'typeorm'
 //import { getManager } from 'typeorm'
@@ -14,7 +15,11 @@ import { SurveyQuestion } from '../entities/SurveyQuestion'
 import { User } from '../entities/User'
 import { Resolvers } from './schema.types'
 
+
+
+
 export const pubsub = new PubSub()
+export const my_redis = new Redis()
 
 export function getSchema() {
   const schema = readFileSync(path.join(__dirname, 'schema.graphql'))
@@ -26,6 +31,7 @@ interface Context {
   request: Request
   response: Response
   pubsub: PubSub
+  redis: Redis.Redis
 }
 
 export const graphqlRoot: Resolvers<Context> = {
@@ -92,9 +98,15 @@ export const graphqlRoot: Resolvers<Context> = {
 
       return true
     },
-    createPartyRocker: async (_, { input }, ctx) => {
+    createPartyRocker: async (_, { input }, {redis}) => {
       const { name } = input
 
+      const numPartyRockers = await redis.incr("numPartyRockers")
+
+
+      const response = redis.hmset(`partyRocker:${numPartyRockers}`, "id", numPartyRockers, "name", name) //should i store empty strings here??
+
+      console.log("hmset response", response)
       const partyRocker = new PartyRocker()
       partyRocker.name = name
       await partyRocker.save()
