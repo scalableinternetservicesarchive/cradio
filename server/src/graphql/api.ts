@@ -118,7 +118,7 @@ export const graphqlRoot: Resolvers<Context> = {
      const queueLength = Number(listeningSessionQueueLength[0])
 
      const numQueueItems= await redis.incr("numQueueItems") //Incrementer to use for a unique id, race conditions???
-     const response = await redis.hmset(`queueItem:${numQueueItems}`, "id", numQueueItems, "score", 0, "position", queueLength + 1) //should i store for song and listening session here??
+     const response = await redis.hmset(`queueItem:${numQueueItems}`, "id", numQueueItems, "score", 0, "position", queueLength + 1, "songId", songId) //should i store for song and listening session here??
 
      if (response != "OK"){
        return false
@@ -276,6 +276,13 @@ export const graphqlRoot: Resolvers<Context> = {
         result.push(partyRocker)})
       return result
 
+    }
+  },
+  Queue: {
+    async song(parent, args, {redis})  {
+      const songId = await redis.hget(`queueItem:${parent.id}`, "songId") //Maybe change this to speed up?
+      const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
+      return song
     }
   },
   Subscription: {
