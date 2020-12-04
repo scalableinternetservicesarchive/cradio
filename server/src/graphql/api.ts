@@ -171,13 +171,15 @@ export const graphqlRoot: Resolvers<Context> = {
 
       const listeningSessionRedis = await redis.hmset(`listeningSession:${numListeningSessions}`, listeningSession)
       console.log("session creation result", listeningSessionRedis)
-      const listeningSessionResult = await redis.hgetall(`listeningSession:${numListeningSessions}`)
-      console.log("creation result", listeningSessionResult)
+      // const listeningSessionResult = await redis.hgetall(`listeningSession:${numListeningSessions}`)
+      // console.log("creation result", listeningSessionResult)
 
+      const numIdsAdded = await redis.sadd(`listeningSession:${numListeningSessions}:partyRockers`, ownerId)
+      if (numIdsAdded == 0){
+        throw new Error("Error Adding Owner to list of rockers in listening session")
+      }
 
-      //const listeningSession = {id: numListeningSessions, timeCreated: secondsSinceEpoch, queueLength: 0, owner: ownerId} //do i need to return an empty list here for queue?? what about party rockers?? will the resolvers handle this if i omit those??
-
-
+      //OLD CODE WHEN USING SQL TYPE ORM
       // const listeningSession = new ListeningSession()
       // listeningSession.owner = owner
       // listeningSession.timeCreated = Math.round(Date.now() / 1000)
@@ -185,12 +187,7 @@ export const graphqlRoot: Resolvers<Context> = {
       // listeningSession.partyRockers = []
       // listeningSession.partyRockers.push(owner)
       // listeningSession.queue = []
-
-
-
       // await listeningSession.save()
-
-
       // owner.listeningSession = listeningSession
       // await owner.save()
 
@@ -263,16 +260,19 @@ export const graphqlRoot: Resolvers<Context> = {
   },
   ListeningSession: {
     async queue(parent, args, {redis})  {
-      const queueItemIds = await redis.smembers(`listeningSession:${parent.id}:queue`)
+      const queueItemIds = await redis.smembers(`listeningSession:${parent.id}:queue`) //Get the Ids (keys) of the items you wanna fetch
       const result: any[] = []
+      //for each Id fetch the item from redis and push the retrieved item into the result list
       queueItemIds.forEach(async queueItemId => { const queueItem = await redis.hgetall(`queueItem:${queueItemId}`)
          result.push(queueItem)
          console.log("queue item searh result: ", queueItem)}
         )
 
+      //I tried this too but this wont work either, queueItems is undefined
       // const promises = queueItemIds.map(async (item, index) => {  redis.hgetall(`queueItem:${item}`)})
       // const queueItems = await Promise.all(promises)
       // console.log("queue items result", queueItems)
+
       return result
 
     },
