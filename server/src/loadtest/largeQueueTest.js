@@ -18,7 +18,7 @@ export const options = {
   scenarios: {
     contacts: {
       executor: 'per-vu-iterations', //500 iterators each running the function once
-      vus: 40,
+      vus: 500,
       iterations: 1,
       maxDuration: '30s',
     },
@@ -63,7 +63,7 @@ export default function (data) {
   // recordRates(
 
   const sleepTime = Math.floor(Math.random() * Math.floor(20)) + 1
-//   console.log('sleeping for: ', sleepTime)
+  //   console.log('sleeping for: ', sleepTime)
   sleep(sleepTime)
 
   //we want to queue a "random" song out of the list of songs instead of queueing the same song every time
@@ -85,18 +85,18 @@ export default function (data) {
 }
 
 export function teardown(data) {
-//delete the listensing session (and therefore the related queue)
-   const deleteSessionResult = http.post(
-     'http://localhost:3000/graphql',
-     `{"operationName":"DeleteListeningSession","variables":{"sessionId":${data.sessionId}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
-     {
-       headers: {
-       'Content-Type': 'application/json',
+  //delete the listensing session (and therefore the related queue)
+  const deleteSessionResult = http.post(
+    'http://localhost:3000/graphql',
+    `{"operationName":"DeleteListeningSession","variables":{"sessionId":${data.sessionId}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
       },
     }
-   )
+  )
 
-//   console.log(deleteSessionResult.body)
+  //console.log(deleteSessionResult.body)
 }
 
 const count200 = new Counter('status_code_2xx')
@@ -114,7 +114,7 @@ function recordRates(res) {
     count200.add(1)
     rate200.add(1)
   } else if (res.status >= 300 && res.status < 400) {
-//     console.log(res.body)
+    //     console.log(res.body)
     count300.add(1)
     rate300.add(1)
   } else if (res.status >= 400 && res.status < 500) {
