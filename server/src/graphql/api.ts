@@ -261,28 +261,33 @@ export const graphqlRoot: Resolvers<Context> = {
   ListeningSession: {
     async queue(parent, args, {redis})  {
       const queueItemIds = await redis.smembers(`listeningSession:${parent.id}:queue`) //Get the Ids (keys) of the items you wanna fetch
-      const result: any[] = []
-      //for each Id fetch the item from redis and push the retrieved item into the result list
-      queueItemIds.forEach(async queueItemId => { const queueItem = await redis.hgetall(`queueItem:${queueItemId}`)
-         result.push(queueItem)
-         console.log("queue item searh result: ", queueItem)}
-        )
+      // const result: any[] = []
+      // //for each Id fetch the item from redis and push the retrieved item into the result list
+      // queueItemIds.forEach(async queueItemId => { const queueItem = await redis.hgetall(`queueItem:${queueItemId}`)
+      //    result.push(queueItem)
+      //    console.log("queue item searh result: ", queueItem)}
+      //   )
 
-      //I tried this too but this wont work either, queueItems is undefined
-      // const promises = queueItemIds.map(async (item, index) => {  redis.hgetall(`queueItem:${item}`)})
-      // const queueItems = await Promise.all(promises)
-      // console.log("queue items result", queueItems)
 
-      return result
+      const promises = queueItemIds.map(async (item, index) =>  redis.hgetall(`queueItem:${item}`))
+      const queueItems = await Promise.all(promises)
+      console.log("queue items result", queueItems)
+
+      return queueItems as any
 
     },
     async partyRockers(parent, args, {redis})  {
       const partyRockerIds = await redis.smembers(`listeningSession:${parent.id}:partyRockers`)
-      let result: any[] = [] //what to do about this???
-      partyRockerIds.forEach(async partyRockerId => { const partyRocker = await redis.hgetall(`partyRocker:${partyRockerId}`)
-      console.log("party rocker to add to list: ", partyRocker)
-        result.push(partyRocker)})
-      return result
+      // let result: any[] = [] //what to do about this???
+      // partyRockerIds.forEach(async partyRockerId => { const partyRocker = await redis.hgetall(`partyRocker:${partyRockerId}`)
+      // console.log("party rocker to add to list: ", partyRocker)
+      //   result.push(partyRocker)})
+
+
+        const promises = partyRockerIds.map(async (item, index) =>  redis.hgetall(`partyRocker:${item}`))
+        const partyRockers = await Promise.all(promises)
+        console.log("party rockers result", partyRockers)
+      return partyRockers as any
 
     },
     async owner(parent, args, {redis})  {
