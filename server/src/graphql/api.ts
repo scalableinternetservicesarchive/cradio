@@ -212,6 +212,14 @@ export const graphqlRoot: Resolvers<Context> = {
       const deleteQueueResult = await redis.del(`listeningSession:${sessionId}:queue`)
       console.log("number of keys removed ", deleteQueueResult)
 
+      const partyRockerIds = await redis.smembers(`listeningSession:${sessionId}:partyRockers`)
+      partyRockerIds.forEach(async partyRockerId => { const partyRockerDelete = await redis.del(`queueItem:${partyRockerId}`)
+         console.log("partyRocker delete result: ", partyRockerDelete)}
+        )
+
+      const deletePartyRockers = await redis.del(`listeningSession:${sessionId}:partyRockers`)
+      console.log("number of keys removed (party Rockers) ", deletePartyRockers)
+
       const deleteSessionResult = await redis.del(`listeningSession:${sessionId}`)
       if (deleteSessionResult <=0 ){
        return false
@@ -276,6 +284,10 @@ export const graphqlRoot: Resolvers<Context> = {
         result.push(partyRocker)})
       return result
 
+    },
+    async owner(parent, args, {redis})  {
+      const owner = await redis.hgetall(`partyRocker:${parent.owner}`)
+      return owner as any
     }
   },
   Queue: {
