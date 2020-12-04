@@ -105,6 +105,14 @@ export const graphqlRoot: Resolvers<Context> = {
 
       return partyRocker
     },
+    deletePartyRocker: async (_, { partyRockerId }, ctx) => {
+
+      const entityManager = getManager();
+      check(await entityManager.delete(PartyRocker, { id: partyRockerId }))
+
+      return true
+
+    },
     createListeningSession: async (_, { partyRockerId }, ctx) => {
 
       const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
