@@ -84,20 +84,20 @@ export default function (data) {
   recordRates(addToQueueResult)
 }
 
-// export function teardown(data) {
-//   //delete the listensing session (and therefore the related queue)
-//   const deleteSessionResult = http.post(
-//     'http://localhost:3000/graphql',
-//     `{"operationName":"DeleteListeningSession","variables":{"sessionId":${data.sessionId}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
-//     {
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     }
-//   )
+export function teardown(data) {
+//delete the listensing session (and therefore the related queue)
+   const deleteSessionResult = http.post(
+     'http://localhost:3000/graphql',
+     `{"operationName":"DeleteListeningSession","variables":{"sessionId":${data.sessionId}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
+     {
+       headers: {
+       'Content-Type': 'application/json',
+      },
+    }
+   )
 
 //   console.log(deleteSessionResult.body)
-// }
+}
 
 const count200 = new Counter('status_code_2xx')
 const count300 = new Counter('status_code_3xx')

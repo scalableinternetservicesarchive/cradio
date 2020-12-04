@@ -3,22 +3,20 @@ import { sleep } from 'k6'
 import { Counter, Rate } from 'k6/metrics'
 
 export const options = {
-  scenarios: {
     scenarios: {
       contacts: {
         executor: 'per-vu-iterations', //500 iterators each running the function once
-        vus: 500,
+        vus: 150,
         iterations: 1,
-        maxDuration: '60s',
+        maxDuration: '0h2m',
+        gracefulStop: '60s',
       },
     },
-  }
 }
 
-const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
-
 export function setup() {
-
+  //create the main session party rocker owner
+  const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"SessionOwner"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
   const mainPartyRocker = http.post(
     'http://localhost:3000/graphql',
     nameGen,
@@ -28,10 +26,9 @@ export function setup() {
       },
     }
   )
-  sleep(Math.random(3));
+  //creating the actual session itself
   const mainID = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
   const sessGen = '{"operationName":"CreateListeningSession","variables":{"partyRockerId":' + String(mainID) + '},"query":"mutation CreateListeningSession($partyRockerId: Int!) {\\n createListeningSession(partyRockerId: $partyRockerId) { \\n id timeCreated }}"}'
-
   const mainSession = http.post(
     'http://localhost:3000/graphql',
     sessGen,
@@ -42,15 +39,16 @@ export function setup() {
     }
   )
   const sessionID = JSON.parse(mainSession.body).data.createListeningSession.id
-//   console.log(mainID)
-//   console.log(sessionID)
-  return {sessionID: sessionID}
+  console.log('Created Session Id is: ' + sessionID)
+  return {listeningSessionId: sessionID}
 }
 
 
 export default function (data) {
 
   //user create a session, have 500 users join the session over some time period --> 60s
+  //creating all the users that will join the session
+  const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"Rocker ' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
 
   const newPartyRocker = http.post(
     'http://localhost:3000/graphql',
@@ -61,9 +59,12 @@ export default function (data) {
       },
     }
   )
-//   console.log("sessionid", data.sessionID)
-  const sessGen = `{"operationName":"JoinListeningSession","variables":{"input": {"partyRockerId":${JSON.parse(newPartyRocker.body).data.createPartyRocker.id}, "sessionId": ${data.sessionID}}},"query":"mutation JoinListeningSession($input: JoinSessionInfo!) {\\n joinListeningSession(input: $input)}"}`
 
+
+  let createdRockerId = JSON.parse(newPartyRocker.body).data.createPartyRocker.id
+  let useSessionId = data.listeningSessionId
+  //console.log('Rocker ' + createdRockerId + ' is trying to join session: ' + useSessionId)
+  const sessGen = '{"operationName":"JoinListeningSession","variables":{"input":{"partyRockerId":' + String(createdRockerId) + ', "sessionId":' + String(useSessionId) + '}},"query":"mutation JoinListeningSession($input: JoinSessionInfo!) {\\n joinListeningSession(input: $input)}"}'
   const joinSession = http.post(
     'http://localhost:3000/graphql',
     sessGen,
@@ -73,8 +74,13 @@ export default function (data) {
       },
     }
   )
-
-//   console.log("join session body",joinSession.body)
+  //console.log(joinSession.body)
+  if(joinSession.body.length == 0){
+    console.log('Response body of length 0 received!')
+  }
+  else if(joinSession.status != 200){
+    console.log('Problem joining session with a response code of: ' + joinSession.status)
+  }
 }
 
 
@@ -82,9 +88,11 @@ export default function (data) {
 
 export function teardown(data) {
 
+  let deleteId = data.listeningSessionId
+  console.log('Session Id of ' + deleteId + ' is to be deleted')
   const deleteSessionResult = http.post(
     'http://localhost:3000/graphql',
-    `{"operationName":"DeleteListeningSession","variables":{"sessionId":${data.sessionId}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
+    '{"operationName":"DeleteListeningSession","variables":{"sessionId":' + deleteId + '},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}',
     {
       headers: {
         'Content-Type': 'application/json',
