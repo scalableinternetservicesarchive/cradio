@@ -4,7 +4,6 @@ import Redis from 'ioredis'
 import path from 'path'
 //import { getManager } from 'typeorm'
 import { check } from '../../../common/src/util'
-import { Queue } from '../entities/Queue'
 import { Song } from '../entities/Song'
 import { Survey } from '../entities/Survey'
 import { SurveyAnswer } from '../entities/SurveyAnswer'
@@ -53,7 +52,12 @@ export const graphqlRoot: Resolvers<Context> = {
     listeningSession: async (_, { sessionId }, {redis}) => { const result = await redis.hgetall(`listeningSession:${sessionId}`)
     console.log("query result:", result)
   return result as any || null},
-    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song', 'listeningSession']})) || null, //do we want this null???
+    sessionQueue: async (_, { sessionId }, {redis}) => {
+    const queueItemIds = await redis.smembers(`listeningSession:${sessionId}:queue`) //Get the Ids (keys) of the items you wanna fetch
+    const promises = queueItemIds.map(async (item, index) =>  redis.hgetall(`queueItem:${item}`))
+    const queueItems = await Promise.all(promises)
+    console.log("queue items result", queueItems)
+    return queueItems as any || null }, //do we want this null???
     surveys: () => Survey.find(),
     //partyRockers: async () => await PartyRocker.find(), //does anyone use this??
     songs: async () => await Song.find({relations: ['artist']}),
@@ -114,7 +118,10 @@ export const graphqlRoot: Resolvers<Context> = {
 
      //Make sure listening session exists
      const listeningSessionQueueLength = await redis.hmget(`listeningSession:${listeningSessionId}`, "queueLength") //error check here if session doesnt exist??
-     console.log("queue length", listeningSessionQueueLength) //ADD ERROR CHECK HERE ?
+     console.log("queue length", listeningSessionQueueLength)
+     if (listeningSessionQueueLength[0] == null){
+       return false
+     }
      const queueLength = Number(listeningSessionQueueLength[0])
 
      const numQueueItems= await redis.incr("numQueueItems") //Incrementer to use for a unique id, race conditions???
@@ -210,7 +217,7 @@ export const graphqlRoot: Resolvers<Context> = {
       console.log("number of keys removed ", deleteQueueResult)
 
       const partyRockerIds = await redis.smembers(`listeningSession:${sessionId}:partyRockers`)
-      partyRockerIds.forEach(async partyRockerId => { const partyRockerDelete = await redis.del(`queueItem:${partyRockerId}`)
+      partyRockerIds.forEach(async partyRockerId => { const partyRockerDelete = await redis.del(`partyRocker:${partyRockerId}`)
          console.log("partyRocker delete result: ", partyRockerDelete)}
         )
 
