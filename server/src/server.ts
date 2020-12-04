@@ -48,7 +48,7 @@ server.express.get('/', (req, res) => {
 
 server.express.get('/app/*', (req, res) => {
   console.log('GET /app')
-  renderApp(req, res)
+  renderApp(req, res, server.executableSchema)
 })
 
 server.express.post(
