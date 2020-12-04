@@ -9,6 +9,7 @@ require('honeycomb-beeline')({
 import assert from 'assert'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import DataLoader from 'dataloader'
 import { json, raw, RequestHandler, static as expressStatic } from 'express'
 import { getOperationAST, parse as parseGraphql, specifiedRules, subscribe as gqlSubscribe, validate } from 'graphql'
 import { GraphQLServer } from 'graphql-yoga'
@@ -20,6 +21,7 @@ import { checkEqual, Unpromise } from '../../common/src/util'
 import { Config } from './config'
 import { migrate } from './db/migrate'
 import { initORM } from './db/sql'
+import { ListeningSession } from './entities/ListeningSession'
 import { Session } from './entities/Session'
 import { User } from './entities/User'
 import { getSchema, graphqlRoot, pubsub } from './graphql/api'
@@ -27,10 +29,32 @@ import { ConnectionManager } from './graphql/ConnectionManager'
 import { expressLambdaProxy } from './lambda/handler'
 import { renderApp } from './render'
 
+/*const createPartyRockerLoader = () =>
+  new DataLoader<number, PartyRocker>(async partyRockerIds => {
+    const rockers = await PartyRocker.findByIds(partyRockerIds as number[])
+    const rockerIdToRocker: Record<number, PartyRocker> = {}
+    rockers.forEach(r => {
+      rockerIdToRocker[r.id] = r
+    })
+    return partyRockerIds.map(rid => rockerIdToRocker[rid])
+  }*/
+  const createListeningSessionLoader = () =>
+  new DataLoader<number, ListeningSession>(async listeningSessionIds => {
+    const listeningSessions = await ListeningSession.findByIds(listeningSessionIds as number[])
+    const listeningSessionIdToListeningSession: Record<number, ListeningSession> = {}
+    listeningSessions.forEach(l => {
+      listeningSessionIdToListeningSession[l.id] = l
+    })
+    return listeningSessionIds.map(lid => listeningSessionIdToListeningSession[lid])
+  })
+
 const server = new GraphQLServer({
   typeDefs: getSchema(),
   resolvers: graphqlRoot as any,
-  context: ctx => ({ ...ctx, pubsub, user: (ctx.request as any)?.user || null }),
+  context: ctx => ({ ...ctx, pubsub, user: (ctx.request as any)?.user || null,
+  //partyRockerLoader: createPartyRockerLoader(),
+  listeningSessionLoader: createListeningSessionLoader(),
+  }),
 })
 
 server.express.use(cookieParser())

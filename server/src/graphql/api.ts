@@ -1,3 +1,4 @@
+import DataLoader from 'dataloader'
 import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
 import path from 'path'
@@ -14,6 +15,7 @@ import { SurveyQuestion } from '../entities/SurveyQuestion'
 import { User } from '../entities/User'
 import { Resolvers } from './schema.types'
 
+
 export const pubsub = new PubSub()
 
 export function getSchema() {
@@ -26,6 +28,8 @@ interface Context {
   request: Request
   response: Response
   pubsub: PubSub
+  //partyRockerLoader: DataLoader<number, PartyRocker>
+  listeningSessionLoader: DataLoader<number, ListeningSession>
 }
 
 export const graphqlRoot: Resolvers<Context> = {
@@ -102,6 +106,7 @@ export const graphqlRoot: Resolvers<Context> = {
       return partyRocker
     },
     createListeningSession: async (_, { partyRockerId }, ctx) => {
+
       const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
 //       console.log(owner)
 
@@ -153,5 +158,21 @@ export const graphqlRoot: Resolvers<Context> = {
       subscribe: (_, { surveyId }, context) => context.pubsub.asyncIterator('SURVEY_UPDATE_' + surveyId),
       resolve: (payload: any) => payload,
     },
-  }
+  },
+
+  /*ListeningSession: {
+    partyRockers: (self, arg, ctx) => {
+      return PartyRocker.find({ where: { listeningSession: self } })
+    },
+    queue: (self, arg, ctx) => {
+      return Queue.find({ where: {listeningSession: self } })
+    },
+  },
+
+  Artist: {
+    songs: (self, arg, ctx) => {
+      return Song.find({ where: { artist: self } })
+    },
+  },*/
+
 }
