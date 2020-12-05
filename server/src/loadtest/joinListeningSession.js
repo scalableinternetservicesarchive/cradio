@@ -45,7 +45,8 @@ export function setup() {
 
 
 export default function (data) {
-
+  const sleepTime = Math.floor(Math.random() * Math.floor(20)) + 1
+  sleep(sleepTime)
   //user create a session, have 500 users join the session over some time period --> 60s
   //creating all the users that will join the session
   const nameGen = '{"operationName":"CreatePartyRocker","variables":{"input":{"name":"Rocker ' + String(__VU) + '"}},"query":"mutation CreatePartyRocker($input: PartyRockerInfo!) { \\n createPartyRocker(input: $input) { \\n id }}"}'
