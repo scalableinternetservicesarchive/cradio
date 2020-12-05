@@ -21,5 +21,6 @@ export class Queue extends BaseEntity {
   // choices: string[]
 
   @ManyToOne(type => ListeningSession, listeningSession => listeningSession.queue, {onDelete: 'CASCADE' })
+  //@ManyToOne(type => ListeningSession, listeningSession => listeningSession.queue)
   listeningSession: ListeningSession
 }
