@@ -13,7 +13,7 @@ export class Queue extends BaseEntity {
   @Column()
   position: number
 
-  @ManyToOne(type => Song, song => song.id, {eager:true})
+  @ManyToOne(type => Song, song => song.id)
   @JoinColumn()
   song: Song
 

@@ -18,6 +18,11 @@ const baseConfig = {
   database: process.env.MYSQL_DATABASE || 'cradio',
 }
 
+export async function getSQLConnection() {
+  const conn = await getConnection()
+  return new SQL(conn)
+}
+
 export async function initORM() {
   return await createConnection({
     ...baseConfig,

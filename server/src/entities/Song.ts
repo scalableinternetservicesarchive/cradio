@@ -18,7 +18,7 @@ export class Song extends BaseEntity {
   // @OneToMany(type => SurveyAnswer, answer => answer.question, { eager: true })
   // answers: SurveyAnswer[]
 
-  @ManyToOne(type => Artist, artist => artist.songs, {eager: true})
+  @ManyToOne(type => Artist, artist => artist.songs)
   artist: Artist
 
 }

@@ -3,8 +3,9 @@ import { readFileSync } from 'fs'
 import { PubSub } from 'graphql-yoga'
 import path from 'path'
 import { getManager } from 'typeorm'
-//import { getManager } from 'typeorm'
 import { check } from '../../../common/src/util'
+import { getSQLConnection } from '../db/sql'
+import { Artist } from '../entities/Artist'
 import { ListeningSession } from '../entities/ListeningSession'
 import { PartyRocker } from '../entities/PartyRocker'
 import { Queue } from '../entities/Queue'
@@ -14,8 +15,6 @@ import { SurveyAnswer } from '../entities/SurveyAnswer'
 import { SurveyQuestion } from '../entities/SurveyQuestion'
 import { User } from '../entities/User'
 import { Resolvers } from './schema.types'
-
-
 export const pubsub = new PubSub()
 
 export function getSchema() {
@@ -28,27 +27,30 @@ interface Context {
   request: Request
   response: Response
   pubsub: PubSub
-  //partyRockerLoader: DataLoader<number, PartyRocker>
+  partyRockerLoader: DataLoader<number, PartyRocker>
   listeningSessionLoader: DataLoader<number, ListeningSession>
+  queueLoader: DataLoader<number, Queue>
+  songLoader: DataLoader<number, Song>
+  artistLoader: DataLoader<number, Artist>
 }
 
 export const graphqlRoot: Resolvers<Context> = {
   Query: {
     self: (_, args, ctx) => ctx.user,
     survey: async (_, { surveyId }) => (await Survey.findOne({ where: { id: surveyId } })) || null,
-    listeningSession: async (_, { sessionId }) => { const result = await ListeningSession.findOne({ where: { id: sessionId }, relations: ['owner', 'partyRockers'] })
-    console.log("result", result)
+    listeningSession: async (_, { sessionId }) => { const result = await ListeningSession.findOne({ where: { id: sessionId }})
+    //console.log("result", result)
   return result || null},
-    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song', 'listeningSession']})) || null, //do we want this null???
+    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} }})) || null, //do we want this null???
     surveys: () => Survey.find(),
     partyRockers: async () => await PartyRocker.find(),
-    songs: async () => await Song.find({relations: ['artist']}),
-    song: async (_, { songName }) => (await Song.find({ where: { name: songName }, relations: ['artist'] }))
+    songs: async () => await Song.find(),
+    song: async (_, { songName }) => (await Song.find({ where: { name: songName }}))
   },
   Mutation: {
     answerSurvey: async (_, { input }, ctx) => {
       const { answer, questionId } = input
-      const question = check(await SurveyQuestion.findOne({ where: { id: questionId }, relations: ['survey'] }))
+      const question = check(await SurveyQuestion.findOne({ where: { id: questionId }}))
 
       const surveyAnswer = new SurveyAnswer()
       surveyAnswer.question = question
@@ -70,8 +72,8 @@ export const graphqlRoot: Resolvers<Context> = {
     },
     addToQueue: async (_, { input }, ctx) => {
       const { songId, listeningSessionId } = input
-      const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
-      const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song']}))
+      const song = check(await Song.findOne({ where: { id: songId }}))
+      const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }}))
 
       const queueItem = new Queue()
       queueItem.score = 0
@@ -115,7 +117,7 @@ export const graphqlRoot: Resolvers<Context> = {
     },
     createListeningSession: async (_, { partyRockerId }, ctx) => {
 
-      const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
+      const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }}))
 //       console.log(owner)
 
       const listeningSession = new ListeningSession()
@@ -150,8 +152,8 @@ export const graphqlRoot: Resolvers<Context> = {
     },
     joinListeningSession: async (_, { input }, ctx) => {
       const { partyRockerId, sessionId } = input
-      const partyRocker = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
-      const listeningSession = check(await ListeningSession.findOne({ where: { id: sessionId }, relations: ['partyRockers']}))
+      const partyRocker = check(await PartyRocker.findOne({ where: { id: partyRockerId }}))
+      const listeningSession = check(await ListeningSession.findOne({ where: { id: sessionId }}))
 
       listeningSession.partyRockers.push(partyRocker)
 
@@ -168,19 +170,102 @@ export const graphqlRoot: Resolvers<Context> = {
     },
   },
 
-  /*ListeningSession: {
-    partyRockers: (self, arg, ctx) => {
-      return PartyRocker.find({ where: { listeningSession: self } })
+  ListeningSession: {
+    partyRockers: async (self, arg, ctx) => {
+      //return PartyRocker.find({ where: { listeningSession: self } })
+      //let foundRockers = await PartyRocker.find({ where: { listeningSession: self } })
+      //let foundRockers = await PartyRocker.find({ select: ["id"], where: { listeningSession: self } })
+      //let rockerIdArr: Array<number> = []
+      //foundRockers.forEach(fr => {
+        //rockerIdArr.push(fr.id)
+      //})
+      const sql = await getSQLConnection()
+      const RockersId = await sql.query(`SELECT id from party_rocker where listeningSessionId = ${self.id}`, [1])
+      let arrRockers: Array<number> = []
+      RockersId.forEach((r: any) => {
+        arrRockers.push(r.id)
+      })
+      return ctx.partyRockerLoader.loadMany(arrRockers) as any
     },
-    queue: (self, arg, ctx) => {
-      return Queue.find({ where: {listeningSession: self } })
+    queue: async (self, arg, ctx) => {
+      /*let foundQueues = await Queue.find({ where: { listeningSession: self } })
+      let queueIdArr: Array<number> = []
+      foundQueues.forEach(fr => {
+        queueIdArr.push(fr.id)
+      })*/
+      //return Queue.find({ where: {listeningSession: self } })
+      const sql = await getSQLConnection()
+      const QueuesId = await sql.query(`SELECT id from queue where listeningSessionId = ${self.id}`, [1])
+      let arrQueues: Array<number> = []
+      QueuesId.forEach((q: any) => {
+        arrQueues.push(q.id)
+      })
+      return ctx.partyRockerLoader.loadMany(arrQueues) as any
+    },
+    owner: async (self, arg, ctx) => {
+      const sql = await getSQLConnection()
+      const [OwnerId] = await sql.query(`SELECT ownerId from listening_session where id = ${self.id}`, [1])
+      //const result = await PartyRocker.findOne({ where: { id: OwnerId.ownerId } })
+      //return result as any
+      return ctx.partyRockerLoader.load(OwnerId.ownerId) as any
+    },
+  },
+
+  PartyRocker: {
+    listeningSession: async (self, arg, ctx) => {
+      //return ListeningSession.find({ where: { partyRockers: self } })
+      //return ctx.partyRockerLoader.load((self as any)) as any
+      const sql = await getSQLConnection()
+      const [SessionId] = await sql.query(`SELECT listeningSessionId from party_rocker where id = ${self.id}`, [1])
+      //const result = await ListeningSession.findOne({ where: { id: SessionId.listeningSessionId } })
+      //return result as any
+      return ctx.listeningSessionLoader.load(SessionId.listeningSessionId)
     },
   },
 
   Artist: {
-    songs: (self, arg, ctx) => {
-      return Song.find({ where: { artist: self } })
+    songs: async (self, arg, ctx) => {
+      //return Song.find({ where: { artist: self } })
+      /*let foundSongs = await Song.find({ where: { Artist: self } })
+      let songIdArr: Array<number> = []
+      foundSongs.forEach(fs => {
+        songIdArr.push(fs.id)
+      })*/
+      const sql = await getSQLConnection()
+      const SongsId = await sql.query(`SELECT id from songs where artistId = ${self.id}`, [1])
+      let arrSongs: Array<number> = []
+      SongsId.forEach((s: any) => {
+        arrSongs.push(s.id)
+      })
+      return ctx.songLoader.loadMany(arrSongs) as any
     },
-  },*/
+  },
+
+  Song: {
+    artist: async (self, arg, ctx) => {
+      const sql = await getSQLConnection()
+      const [ArtistId] = await sql.query(`SELECT artistId from song where id = ${self.id}`, [1])
+      //const result = await Artist.findOne({ where: { id: ArtistId.artistId } })
+      //return result as any
+      return ctx.artistLoader.load(ArtistId.artistId) as any
+    },
+  },
+
+  Queue: {
+    song: async (self, arg, ctx) => {
+      const sql = await getSQLConnection()
+      const [SongId] = await sql.query(`SELECT songId from queue where id = ${self.id}`, [1])
+      //const result = await Song.findOne({ where: { id: SongId.songId } })
+      //return result as any
+      return ctx.songLoader.load(SongId.songId) as any
+    },
+    listeningSession: async (self, arg, ctx) => {
+      const sql = await getSQLConnection()
+      const [SessionId] = await sql.query(`SELECT listeningSessionId from queue where id = ${self.id}`, [1])
+      //const result = await ListeningSession.findOne({ where: { id: SessionId.listeningSessionId } })
+      //return result as any
+      return ctx.listeningSessionLoader.load(SessionId.listeningSessionId) as any
+    },
+  },
 
 }

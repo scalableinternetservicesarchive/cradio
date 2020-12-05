@@ -2,8 +2,8 @@ import http from 'k6/http'
 import { sleep } from 'k6'
 import { Counter, Rate } from 'k6/metrics'
 
-const numOfVus = 50
-const numOfIterations = 3
+const numOfVus = 100
+const numOfIterations = 4
 export const options = {
   scenarios: {
     manyUsers: {
