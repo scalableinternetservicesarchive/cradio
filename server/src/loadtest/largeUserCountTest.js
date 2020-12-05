@@ -21,6 +21,9 @@ const partyRockerCreation_Success = new Counter('PartyRocker_Creation_Success')
 const listeningSessionCreation_Success = new Counter('ListeningSession_Creation_Success')
 const addToQueue_Success = new Counter('AddToQueue_Creation_Success')
 
+let partyRockerIds = []
+let listeningSessionIds = []
+
 export default function () {
   // recordRates(
 
@@ -41,6 +44,7 @@ export default function () {
   if (mainPartyRocker.status >= 200 && mainPartyRocker.status < 300) {
     partyRockerCreation_Success.add(1)
     const partyRockerId = JSON.parse(mainPartyRocker.body).data.createPartyRocker.id
+    partyRockerIds.push(partyRockerId)
     // console.log("party rocker: ", partyRockerId)
 
     sleep(Math.random(3));
@@ -63,6 +67,7 @@ export default function () {
       listeningSessionCreation_Success.add(1)
 
       const listeningSessionID = JSON.parse(mainSession.body).data.createListeningSession.id
+      listeningSessionIds.push(listeningSessionID)
       // console.log("session creation: " , mainSession.status)
 
       // const listeningSessionId = mainSession.body.match(/[1-9][0-9]*/)
@@ -92,11 +97,39 @@ export default function () {
   // http.get('http://localhost:3000')
 }
 
-// export function teardown() {
 
+export function teardown() {
 
+  //delete the party rockers
+  for (let i = 0; i < partyRockerIds.length; i++) {
+    http.post(
+      'http://localhost:3000/graphql',
+      `{"operationName":"DeletePartyRocker","variables":{"partyRockerId":${partyRockerIds[i]}},"query":"mutation DeletePartyRocker($partyRockerId: Int!) { \\n deletePartyRocker(partyRockerId: $partyRockerId)}"}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
 
-// }
+  }
+
+  //delete the listensing sessions (and therefore the related queue)
+  for (let i = 0; i < listeningSessionIds.length; i++) {
+    http.post(
+      'http://localhost:3000/graphql',
+      `{"operationName":"DeleteListeningSession","variables":{"sessionId":${listeningSessionIds[i]}},"query":"mutation DeleteListeningSession($sessionId: Int!) { \\n deleteListeningSession(sessionId: $sessionId)}"}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+  }
+  console.log("Done deleting everything!")
+}
+
 
 const count200 = new Counter('status_code_2xx')
 const count300 = new Counter('status_code_3xx')

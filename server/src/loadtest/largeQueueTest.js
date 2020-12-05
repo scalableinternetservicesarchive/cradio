@@ -96,7 +96,7 @@ export function teardown(data) {
     }
   )
 
-  console.log(deleteSessionResult.body)
+  //console.log(deleteSessionResult.body)
 }
 
 const count200 = new Counter('status_code_2xx')
