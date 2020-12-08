@@ -92,10 +92,15 @@ export interface MutationDeletePartyRockerArgs {
 export interface Subscription {
   __typename?: 'Subscription'
   surveyUpdates?: Maybe<Survey>
+  queueUpdates?: Maybe<Queue>
 }
 
 export interface SubscriptionSurveyUpdatesArgs {
   surveyId: Scalars['Int']
+}
+
+export interface SubscriptionQueueUpdatesArgs {
+  sessionId: Scalars['Int']
 }
 
 export interface User {
@@ -416,6 +421,13 @@ export type SubscriptionResolvers<
     ParentType,
     ContextType,
     RequireFields<SubscriptionSurveyUpdatesArgs, 'surveyId'>
+  >
+  queueUpdates?: SubscriptionResolver<
+    Maybe<ResolversTypes['Queue']>,
+    'queueUpdates',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionQueueUpdatesArgs, 'sessionId'>
   >
 }
 

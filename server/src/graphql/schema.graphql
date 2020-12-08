@@ -51,6 +51,8 @@ type Mutation {
 
 type Subscription {
   surveyUpdates(surveyId: Int!): Survey
+
+  queueUpdates(sessionId: Int!): Queue
 }
 
 type User {

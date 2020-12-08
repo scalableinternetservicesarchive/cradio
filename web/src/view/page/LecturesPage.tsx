@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useQuery, useSubscription } from '@apollo/client'
 import { Grid } from '@material-ui/core'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -15,15 +15,17 @@ import {
   FetchQueue,
   FetchQueueVariables,
   FetchSongs,
+  QueueSubscription,
+  QueueSubscriptionVariables
 } from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
-import { fetchQueue } from '../playground/fetchQueue'
+import { fetchQueue, subscribeQueue } from '../playground/fetchQueue'
 import { fetchSongs } from '../playground/fetchSong'
 import { addToQueue } from '../playground/mutateQueue'
 import { Page } from './Page'
 
-interface LecturesPageProps extends RouteComponentProps, AppRouteParams {}
+interface LecturesPageProps extends RouteComponentProps, AppRouteParams { }
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -58,6 +60,39 @@ export function LecturesPage(props: LecturesPageProps) {
   const { loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
     variables: { sessionId: idSession },
   })
+
+  const [sessionQueue, setSessionQueue] = React.useState(queueData?.sessionQueue)
+  React.useEffect(() => {
+    setSessionQueue(queueData?.sessionQueue)
+  }, [queueData])
+
+
+  console.log("THIS LINE", queueData?.sessionQueue)
+
+  // const sub = useSubscription<QueueSubscription>(subscribeQueue)
+  const sub = useSubscription<QueueSubscription, QueueSubscriptionVariables>(subscribeQueue, {
+    variables: { sessionId: idSession },
+  })
+
+  // React.useEffect(() => {
+  //   if (sub.data?.queueUpdates) {
+  //     setSessionQueue(sub.data.queueUpdates)
+  //   }
+  // }, [sub.data])
+
+  console.log(sessionQueue)
+  console.log(sub.data)
+
+
+
+
+  // React.useEffect(() => {
+  //   if (sub.data?.candyUpdates) {
+  //     toast(sub.data?.candyUpdates.user.name + ' got candy! 🍭😋')
+  //     refetch().catch(handleError)
+  //   }
+  // }, [sub.data])
+
   console.log(queueData)
 
   // React.useEffect(() =>{console.log("session Data", sessionData)}, [sessionData]

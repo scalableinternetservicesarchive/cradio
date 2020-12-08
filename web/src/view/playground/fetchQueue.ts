@@ -18,6 +18,17 @@ export const fragmentQueue = gql`
 `
 
 
+export const subscribeQueue = gql`
+  subscription QueueSubscription($sessionId: Int!) {
+    queueUpdates(sessionId: $sessionId) {
+      ...Queue
+    }
+  }
+  ${fragmentQueue}
+`
+
+
+
 export const fetchQueue = gql`
   query FetchQueue($sessionId: Int!) {
   sessionQueue(sessionId: $sessionId ) {

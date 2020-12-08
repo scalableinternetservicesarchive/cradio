@@ -73,23 +73,24 @@ export const graphqlRoot: Resolvers<Context> = {
       queueItem.score = 0
       queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
       queueItem.song = song
-     // console.log("listening session: ",listeningSession)
+      // console.log("listening session: ",listeningSession)
       queueItem.listeningSession = listeningSession
       //console.log("Queue Item", queueItem)
       check(await queueItem.save())
 
-    //adding the queue item to the listneing session
-    //   console.log("listening session queue", listeningSession.queue)
-    //  listeningSession.queue.push(queueItem)
-    //  check(await listeningSession.save())
+      //adding the queue item to the listneing session
+      //   console.log("listening session queue", listeningSession.queue)
+      //  listeningSession.queue.push(queueItem)
+      //  check(await listeningSession.save())
 
-    //check this below, is this creating a race condition???
-    //  incrementing length of listeningSession.queueLength
-     const entityManager = getManager();
-     // change this to saving the entity above???
-     check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
+      //check this below, is this creating a race condition???
+      //  incrementing length of listeningSession.queueLength
+      const entityManager = getManager();
+      // change this to saving the entity above???
+      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
 
-
+      // Publish the queue update
+      ctx.pubsub.publish('QUEUE_UPDATE' + listeningSessionId, listeningSession.queue)
       return true
     },
     createPartyRocker: async (_, { input }, ctx) => {
@@ -157,6 +158,10 @@ export const graphqlRoot: Resolvers<Context> = {
     }
   },
   Subscription: {
+    queueUpdates: {
+      subscribe: (_, { sessionId }, context) => context.pubsub.asyncIterator('QUEUE_UPDATE' + sessionId),
+      resolve: (payload: any) => payload,
+    },
     surveyUpdates: {
       subscribe: (_, { surveyId }, context) => context.pubsub.asyncIterator('SURVEY_UPDATE_' + surveyId),
       resolve: (payload: any) => payload,
