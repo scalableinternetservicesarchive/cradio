@@ -101,50 +101,6 @@ export interface FetchPartyRocker {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL subscription operation: QueueSubscription
-// ====================================================
-
-export interface QueueSubscription_queueUpdates_song_artist {
-  __typename: "Artist";
-  name: string;
-}
-
-export interface QueueSubscription_queueUpdates_song {
-  __typename: "Song";
-  name: string;
-  genre: string;
-  duration: number;
-  artist: QueueSubscription_queueUpdates_song_artist;
-}
-
-export interface QueueSubscription_queueUpdates_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-}
-
-export interface QueueSubscription_queueUpdates {
-  __typename: "Queue";
-  id: number;
-  score: number;
-  position: number;
-  song: QueueSubscription_queueUpdates_song;
-  listeningSession: QueueSubscription_queueUpdates_listeningSession;
-}
-
-export interface QueueSubscription {
-  queueUpdates: QueueSubscription_queueUpdates | null;
-}
-
-export interface QueueSubscriptionVariables {
-  sessionId: number;
-}
-
-/* tslint:disable */
-/* eslint-disable */
-// @generated
-// This file was automatically generated and should not be edited.
-
-// ====================================================
 // GraphQL query operation: FetchQueue
 // ====================================================
 
@@ -180,6 +136,50 @@ export interface FetchQueue {
 }
 
 export interface FetchQueueVariables {
+  sessionId: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL subscription operation: QueueSubscription
+// ====================================================
+
+export interface QueueSubscription_queueUpdates_song_artist {
+  __typename: "Artist";
+  name: string;
+}
+
+export interface QueueSubscription_queueUpdates_song {
+  __typename: "Song";
+  name: string;
+  genre: string;
+  duration: number;
+  artist: QueueSubscription_queueUpdates_song_artist;
+}
+
+export interface QueueSubscription_queueUpdates_listeningSession {
+  __typename: "ListeningSession";
+  id: number;
+}
+
+export interface QueueSubscription_queueUpdates {
+  __typename: "Queue";
+  id: number;
+  score: number;
+  position: number;
+  song: QueueSubscription_queueUpdates_song;
+  listeningSession: QueueSubscription_queueUpdates_listeningSession;
+}
+
+export interface QueueSubscription {
+  queueUpdates: QueueSubscription_queueUpdates | null;
+}
+
+export interface QueueSubscriptionVariables {
   sessionId: number;
 }
 
