@@ -441,7 +441,7 @@ export type UserResolvers<
   userType?: Resolver<ResolversTypes['UserType'], ParentType, ContextType>
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type SongResolvers<
@@ -453,7 +453,7 @@ export type SongResolvers<
   genre?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   duration?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   artist?: Resolver<ResolversTypes['Artist'], ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type ArtistResolvers<
@@ -464,7 +464,7 @@ export type ArtistResolvers<
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   origin?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   songs?: Resolver<Array<Maybe<ResolversTypes['Song']>>, ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type ListeningSessionResolvers<
@@ -477,7 +477,7 @@ export type ListeningSessionResolvers<
   owner?: Resolver<ResolversTypes['PartyRocker'], ParentType, ContextType>
   partyRockers?: Resolver<Array<ResolversTypes['PartyRocker']>, ParentType, ContextType>
   queue?: Resolver<Maybe<Array<ResolversTypes['Queue']>>, ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type PartyRockerResolvers<
@@ -488,7 +488,7 @@ export type PartyRockerResolvers<
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   spotifyCreds?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   listeningSession?: Resolver<Maybe<ResolversTypes['ListeningSession']>, ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type QueueResolvers<
@@ -500,7 +500,7 @@ export type QueueResolvers<
   position?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   song?: Resolver<ResolversTypes['Song'], ParentType, ContextType>
   listeningSession?: Resolver<ResolversTypes['ListeningSession'], ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type SurveyResolvers<
@@ -513,7 +513,7 @@ export type SurveyResolvers<
   isCompleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   currentQuestion?: Resolver<Maybe<ResolversTypes['SurveyQuestion']>, ParentType, ContextType>
   questions?: Resolver<Array<Maybe<ResolversTypes['SurveyQuestion']>>, ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type SurveyQuestionResolvers<
@@ -525,7 +525,7 @@ export type SurveyQuestionResolvers<
   choices?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>
   answers?: Resolver<Array<ResolversTypes['SurveyAnswer']>, ParentType, ContextType>
   survey?: Resolver<ResolversTypes['Survey'], ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type SurveyAnswerResolvers<
@@ -535,7 +535,7 @@ export type SurveyAnswerResolvers<
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   answer?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   question?: Resolver<ResolversTypes['SurveyQuestion'], ParentType, ContextType>
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type Resolvers<ContextType = any> = {
