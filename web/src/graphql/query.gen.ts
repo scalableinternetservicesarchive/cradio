@@ -395,23 +395,6 @@ export interface CreatePartyRockerVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: DeletePartyRocker
-// ====================================================
-
-export interface DeletePartyRocker {
-  deletePartyRocker: boolean;
-}
-
-export interface DeletePartyRockerVariables {
-  partyRockerId: number;
-}
-
-/* tslint:disable */
-/* eslint-disable */
-// @generated
-// This file was automatically generated and should not be edited.
-
-// ====================================================
 // GraphQL mutation operation: AddToQueue
 // ====================================================
 
