@@ -43,6 +43,19 @@ server.express.use('/app', cors(), expressStatic(path.join(__dirname, '../../pub
 const asyncRoute = (fn: RequestHandler) => (...args: Parameters<RequestHandler>) =>
   fn(args[0], args[1], args[2]).catch(args[2])
 
+
+export async function getNumSessions(): Promise<Number> {
+  const numListeningSessionsResult = await my_redis.mget('numListeningSessions')
+  console.log('number of listening sessions from redis', numListeningSessionsResult)
+  if (numListeningSessionsResult === undefined || numListeningSessionsResult[0] == null) {
+    // array empty or does not exist
+    console.log('Error Getting the number of listening sessions in order to delete')
+  }
+  const numListeningSessions = Number(numListeningSessionsResult[0])
+  return numListeningSessions
+}
+
+
 server.express.get('/', (req, res) => {
   console.log('GET /')
   res.redirect('/app')
@@ -51,6 +64,16 @@ server.express.get('/', (req, res) => {
 server.express.get('/app/*', (req, res) => {
   console.log('GET /app')
   renderApp(req, res, server.executableSchema)
+})
+
+//created this so we could use it in our k6 teardown, didnt wanna mess withour actual api
+server.express.get('/numSessions', async (req, res) => {
+  console.log('GET /numSessions')
+  const body = String(await getNumSessions());
+  res
+      .status(200)
+      .contentType('text/plain')
+      .send(body)
 })
 
 server.express.post(
