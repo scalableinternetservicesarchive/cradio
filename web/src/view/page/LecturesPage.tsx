@@ -1,4 +1,4 @@
-import { useQuery, useSubscription } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { Grid } from '@material-ui/core'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -14,9 +14,7 @@ import {
   FetchListeningSessionVariables,
   FetchQueue,
   FetchQueueVariables,
-  FetchSongs,
-  QueueSubscription,
-  QueueSubscriptionVariables
+  FetchSongs
 } from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
@@ -57,7 +55,7 @@ export function LecturesPage(props: LecturesPageProps) {
 
   //console.log(dataSongs)
   // console.log(sessionData)
-  const { loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
+  const { subscribeToMore, loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
     variables: { sessionId: idSession },
   })
 
@@ -66,13 +64,28 @@ export function LecturesPage(props: LecturesPageProps) {
     setSessionQueue(queueData?.sessionQueue)
   }, [queueData])
 
+  console.log("hello: " , sessionQueue)
 
-  console.log("THIS LINE", queueData?.sessionQueue)
+  React.useEffect(() =>
+    subscribeToMore({
+      document: subscribeQueue,
+      variables: {sessionId: idSession},
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const newQueueItem = subscriptionData.data.sessionQueue;
+        return Object.assign({}, prev, {
+          sessionQueue: [prev.sessionQueue, newQueueItem]
+        });
+      }
+    }),
+    [idSession]
+  )
+  // console.log("THIS LINE", queueData?.sessionQueue)
 
   // const sub = useSubscription<QueueSubscription>(subscribeQueue)
-  const sub = useSubscription<QueueSubscription, QueueSubscriptionVariables>(subscribeQueue, {
-    variables: { sessionId: idSession },
-  })
+  // const {data: sub} = useSubscription<QueueSubscription, QueueSubscriptionVariables>(subscribeQueue, {
+  //   variables: { sessionId: idSession },
+  // })
 
   // React.useEffect(() => {
   //   if (sub.data?.queueUpdates) {
@@ -80,8 +93,7 @@ export function LecturesPage(props: LecturesPageProps) {
   //   }
   // }, [sub.data])
 
-  console.log(sessionQueue)
-  console.log(sub.data)
+  // console.log("here is the subscription data: ", sub?.queueUpdates)
 
 
 
@@ -93,7 +105,7 @@ export function LecturesPage(props: LecturesPageProps) {
   //   }
   // }, [sub.data])
 
-  console.log(queueData)
+  // console.log(queueData)
 
   // React.useEffect(() =>{console.log("session Data", sessionData)}, [sessionData]
   // );
