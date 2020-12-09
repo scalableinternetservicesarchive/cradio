@@ -11,9 +11,6 @@ export const fragmentQueue = gql`
       duration
       artist { name }
     }
-    listeningSession {
-      id
-    }
   }
 `
 
