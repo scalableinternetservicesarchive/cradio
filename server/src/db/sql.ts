@@ -32,7 +32,7 @@ export async function initORM() {
     logging: false,
     entities: [User, Artist, Song, Session, ListeningSession, PartyRocker, Queue, Survey, SurveyQuestion, SurveyAnswer],
     extra: {
-      connectionLimit: 5,
+      connectionLimit: 50,
     },
   })
 }
