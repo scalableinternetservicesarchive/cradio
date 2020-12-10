@@ -32,14 +32,21 @@ export const graphqlRoot: Resolvers<Context> = {
   Query: {
     self: (_, args, ctx) => ctx.user,
     survey: async (_, { surveyId }) => (await Survey.findOne({ where: { id: surveyId } })) || null,
-    listeningSession: async (_, { sessionId }) => { const result = await ListeningSession.findOne({ where: { id: sessionId }, relations: ['owner', 'partyRockers'] })
-    console.log("result", result)
-  return result || null},
-    sessionQueue: async (_, { sessionId }) => (await Queue.find({ where: { listeningSession:{id: sessionId} } , relations: ['song', 'listeningSession']})) || null, //do we want this null???
+    listeningSession: async (_, { sessionId }) => {
+      const result = await ListeningSession.findOne({
+        where: { id: sessionId },
+        relations: ['owner', 'partyRockers', 'queue', 'queue.song'],
+      })
+      // console.log("result", result)
+      return result || null
+    },
+    sessionQueue: async (_, { sessionId }) =>
+      (await Queue.find({ where: { listeningSession: { id: sessionId } }, relations: ['song', 'listeningSession'] })) ||
+      null, //do we want this null???
     surveys: () => Survey.find(),
-    partyRockers: async () => await PartyRocker.find(),
-    songs: async () => await Song.find({relations: ['artist']}),
-    song: async (_, { songName }) => (await Song.find({ where: { name: songName }, relations: ['artist'] }))
+    partyRockers: async () => await PartyRocker.find({ relations: ['listeningSession'] }),
+    songs: async () => await Song.find({ relations: ['artist'] }),
+    song: async (_, { songName }) => await Song.find({ where: { name: songName }, relations: ['artist'] }),
   },
   Mutation: {
     answerSurvey: async (_, { input }, ctx) => {
@@ -67,7 +74,9 @@ export const graphqlRoot: Resolvers<Context> = {
     addToQueue: async (_, { input }, ctx) => {
       const { songId, listeningSessionId } = input
       const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
-      const listeningSession = check(await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song']}))
+      const listeningSession = check(
+        await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song'] })
+      )
 
       const queueItem = new Queue()
       queueItem.score = 0
@@ -85,9 +94,9 @@ export const graphqlRoot: Resolvers<Context> = {
 
       //check this below, is this creating a race condition???
       //  incrementing length of listeningSession.queueLength
-      const entityManager = getManager();
+      const entityManager = getManager()
       // change this to saving the entity above???
-      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
+      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, 'queueLength', 1))
 
       // Publish the queue update
       ctx.pubsub.publish('QUEUE_UPDATE' + listeningSessionId, listeningSession.queue)
@@ -103,16 +112,14 @@ export const graphqlRoot: Resolvers<Context> = {
       return partyRocker
     },
     deletePartyRocker: async (_, { partyRockerId }, ctx) => {
-
-      const entityManager = getManager();
+      const entityManager = getManager()
       check(await entityManager.delete(PartyRocker, { id: partyRockerId }))
 
       return true
-
     },
     createListeningSession: async (_, { partyRockerId }, ctx) => {
-      const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
-//       console.log(owner)
+      const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession'] }))
+      //       console.log(owner)
 
       const listeningSession = new ListeningSession()
 
@@ -123,31 +130,27 @@ export const graphqlRoot: Resolvers<Context> = {
       listeningSession.partyRockers.push(owner)
       listeningSession.queue = []
 
-
-
       await listeningSession.save()
-
 
       owner.listeningSession = listeningSession
       await owner.save()
 
-
       return listeningSession
     },
     deleteListeningSession: async (_, { sessionId }, ctx) => {
-
-
-      const entityManager = getManager();
+      const entityManager = getManager()
       check(await entityManager.delete(ListeningSession, { id: sessionId }))
 
       return true
-
-
     },
     joinListeningSession: async (_, { input }, ctx) => {
       const { partyRockerId, sessionId } = input
-      const partyRocker = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
-      const listeningSession = check(await ListeningSession.findOne({ where: { id: sessionId }, relations: ['partyRockers']}))
+      const partyRocker = check(
+        await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession'] })
+      )
+      const listeningSession = check(
+        await ListeningSession.findOne({ where: { id: sessionId }, relations: ['partyRockers'] })
+      )
 
       listeningSession.partyRockers.push(partyRocker)
 
@@ -155,7 +158,7 @@ export const graphqlRoot: Resolvers<Context> = {
       partyRocker.listeningSession = listeningSession
       await partyRocker.save()
       return true
-    }
+    },
   },
   Subscription: {
     queueUpdates: {
@@ -166,5 +169,5 @@ export const graphqlRoot: Resolvers<Context> = {
       subscribe: (_, { surveyId }, context) => context.pubsub.asyncIterator('SURVEY_UPDATE_' + surveyId),
       resolve: (payload: any) => payload,
     },
-  }
+  },
 }

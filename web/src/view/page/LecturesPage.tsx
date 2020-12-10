@@ -16,16 +16,18 @@ import {
   FetchQueueVariables,
   FetchSongs,
   QueueSubscription,
-  QueueSubscriptionVariables
+  QueueSubscriptionVariables,
 } from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
 import { fetchQueue, subscribeQueue } from '../playground/fetchQueue'
 import { fetchSongs } from '../playground/fetchSong'
 import { addToQueue } from '../playground/mutateQueue'
+import { handleError } from '../toast/error'
+import { toast } from '../toast/toast'
 import { Page } from './Page'
 
-interface LecturesPageProps extends RouteComponentProps, AppRouteParams { }
+interface LecturesPageProps extends RouteComponentProps, AppRouteParams {}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -55,36 +57,34 @@ export function LecturesPage(props: LecturesPageProps) {
     }
   )
 
-  //console.log(dataSongs)
-  // console.log(sessionData)
-  const { loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
+  const { loading: loadingQueue, data: queueData, refetch } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
     variables: { sessionId: idSession },
   })
+  // ^might need to grab a refetch so can use refetch()
 
+  ///////////////////////////////////////////////////
   const [sessionQueue, setSessionQueue] = React.useState(queueData?.sessionQueue)
   React.useEffect(() => {
     setSessionQueue(queueData?.sessionQueue)
   }, [queueData])
 
-
-  console.log("THIS LINE", queueData?.sessionQueue)
+  console.log('THIS LINE', queueData?.sessionQueue)
 
   // const sub = useSubscription<QueueSubscription>(subscribeQueue)
   const sub = useSubscription<QueueSubscription, QueueSubscriptionVariables>(subscribeQueue, {
     variables: { sessionId: idSession },
   })
 
-  // React.useEffect(() => {
-  //   if (sub.data?.queueUpdates) {
-  //     setSessionQueue(sub.data.queueUpdates)
-  //   }
-  // }, [sub.data])
+  React.useEffect(() => {
+    if (sub.data?.queueUpdates) {
+      refetch().catch(handleError)
+      toast(sub.data?.queueUpdates.song + ' added to the queue! 🕺💃🎉')
+      // setSessionQueue(sub.data.queueUpdates.listeningSession)
+    }
+  }, [sub.data])
 
   console.log(sessionQueue)
-  console.log(sub.data)
-
-
-
+  // console.log(sub.data)
 
   // React.useEffect(() => {
   //   if (sub.data?.candyUpdates) {
@@ -93,7 +93,7 @@ export function LecturesPage(props: LecturesPageProps) {
   //   }
   // }, [sub.data])
 
-  console.log(queueData)
+  // console.log(queueData)
 
   // React.useEffect(() =>{console.log("session Data", sessionData)}, [sessionData]
   // );
