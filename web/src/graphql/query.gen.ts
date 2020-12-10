@@ -117,18 +117,12 @@ export interface FetchQueue_sessionQueue_song {
   artist: FetchQueue_sessionQueue_song_artist;
 }
 
-export interface FetchQueue_sessionQueue_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-}
-
 export interface FetchQueue_sessionQueue {
   __typename: "Queue";
   id: number;
   score: number;
   position: number;
   song: FetchQueue_sessionQueue_song;
-  listeningSession: FetchQueue_sessionQueue_listeningSession;
 }
 
 export interface FetchQueue {
@@ -549,18 +543,12 @@ export interface Queue_song {
   artist: Queue_song_artist;
 }
 
-export interface Queue_listeningSession {
-  __typename: "ListeningSession";
-  id: number;
-}
-
 export interface Queue {
   __typename: "Queue";
   id: number;
   score: number;
   position: number;
   song: Queue_song;
-  listeningSession: Queue_listeningSession;
 }
 
 /* tslint:disable */
