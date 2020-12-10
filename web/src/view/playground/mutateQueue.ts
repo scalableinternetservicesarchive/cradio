@@ -1,10 +1,6 @@
 import { gql } from '@apollo/client'
 import { getApolloClient } from '../../graphql/apolloClient'
-import {
-  AddToQueue,
-  AddToQueueVariables,
-  QueueInfo
-} from '../../graphql/query.gen'
+import { AddToQueue, AddToQueueVariables, QueueInfo } from '../../graphql/query.gen'
 
 const addToQueueMutation = gql`
   mutation AddToQueue($input: QueueInfo!) {
@@ -18,7 +14,6 @@ export function addToQueue(input: QueueInfo) {
     variables: { input },
   })
 }
-
 
 // const answerSurveyQuestionMutation = gql`
 //   mutation AnswerSurveyQuestion($input: SurveyInput!) {

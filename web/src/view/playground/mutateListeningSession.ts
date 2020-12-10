@@ -7,10 +7,8 @@ import {
   DeleteListeningSessionVariables,
   JoinListeningSession,
   JoinListeningSessionVariables,
-  JoinSessionInfo
+  JoinSessionInfo,
 } from '../../graphql/query.gen'
-
-
 
 // For creating new listening sessions
 const deleteListeningSessionMutation = gql`
@@ -42,8 +40,6 @@ export function createListeningSession(partyRockerId: number) {
     variables: { partyRockerId },
   })
 }
-
-
 
 // For adding to an existing session
 const joinListeningSessionMutation = gql`

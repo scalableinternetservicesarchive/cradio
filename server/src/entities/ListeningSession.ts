@@ -14,13 +14,13 @@ export class ListeningSession extends BaseEntity {
   @Column()
   queueLength: number
 
-  @OneToOne(type => PartyRocker, {cascade:true, onDelete: 'CASCADE' })
+  @OneToOne(type => PartyRocker, { cascade: true, onDelete: 'CASCADE' })
   @JoinColumn()
   owner: PartyRocker
 
-  @OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession, {cascade:true, onDelete: 'CASCADE' })
+  @OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession, { cascade: true, onDelete: 'CASCADE' })
   partyRockers: PartyRocker[]
 
-  @OneToMany(type => Queue, queue => queue.listeningSession, {cascade:true, onDelete: 'CASCADE' })
+  @OneToMany(type => Queue, queue => queue.listeningSession, { cascade: true, onDelete: 'CASCADE' })
   queue: Queue[]
 }

@@ -1,10 +1,6 @@
 import { gql } from '@apollo/client'
 import { getApolloClient } from '../../graphql/apolloClient'
-import {
-  CreatePartyRocker,
-  CreatePartyRockerVariables,
-  PartyRockerInfo
-} from '../../graphql/query.gen'
+import { CreatePartyRocker, CreatePartyRockerVariables, PartyRockerInfo } from '../../graphql/query.gen'
 
 // const answerSurveyQuestionMutation = gql`
 //   mutation AnswerSurveyQuestion($input: SurveyInput!) {

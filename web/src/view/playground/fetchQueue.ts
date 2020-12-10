@@ -5,20 +5,21 @@ export const fragmentQueue = gql`
     id
     score
     position
-    song{
+    song {
       name
       genre
       duration
-      artist { name }
+      artist {
+        name
+      }
     }
   }
 `
 
-
 export const fetchQueue = gql`
   query FetchQueue($sessionId: Int!) {
-  sessionQueue(sessionId: $sessionId ) {
-    ...Queue
+    sessionQueue(sessionId: $sessionId) {
+      ...Queue
     }
   }
   ${fragmentQueue}

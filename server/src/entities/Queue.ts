@@ -13,13 +13,13 @@ export class Queue extends BaseEntity {
   @Column()
   position: number
 
-  @ManyToOne(type => Song, song => song.id, {eager:true})
+  @ManyToOne(type => Song, song => song.id, { eager: true })
   @JoinColumn()
   song: Song
 
   // @Column('simple-array', { nullable: true })
   // choices: string[]
 
-  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.queue, {onDelete: 'CASCADE' })
+  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.queue, { onDelete: 'CASCADE' })
   listeningSession: ListeningSession
 }

@@ -1,6 +1,5 @@
 import { gql } from '@apollo/client'
 
-
 // export const fragmentSurvey = gql`
 //   fragment Survey on Survey {
 //     id
@@ -31,6 +30,4 @@ export const fetchPartyRocker = gql`
     }
   }
   ${fragmentPartyRocker}
-
-
 `

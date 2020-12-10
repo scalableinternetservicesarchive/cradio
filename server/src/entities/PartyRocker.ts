@@ -5,7 +5,6 @@ import { ListeningSession } from './ListeningSession'
 
 @Entity()
 export class PartyRocker extends BaseEntity {
-
   @PrimaryGeneratedColumn()
   id: number
 
@@ -14,10 +13,9 @@ export class PartyRocker extends BaseEntity {
   })
   name: string
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   spotifyCreds: string
 
-  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.partyRockers,  {onDelete: 'CASCADE' })
+  @ManyToOne(type => ListeningSession, listeningSession => listeningSession.partyRockers, { onDelete: 'CASCADE' })
   listeningSession: ListeningSession
-
 }

@@ -15,8 +15,6 @@ export class Artist extends BaseEntity {
   @OneToMany(type => Song, song => song.artist)
   songs: Song[]
 
-
-
   // get isStarted() {
   //   return this.currQuestion != null
   // }
