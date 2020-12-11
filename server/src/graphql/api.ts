@@ -86,7 +86,7 @@ export const graphqlRoot: Resolvers<Context> = {
       ctx.pubsub.publish('SURVEY_UPDATE_' + surveyId, survey)
       return survey
     },
-    addToQueue: async (_, { input }, {redis}) => {
+    addToQueue: async (_, { input }, {redis, pubsub}) => {
       const { songId, listeningSessionId } = input
       const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
       console.log("adding song to queue: ", song)
@@ -115,19 +115,19 @@ export const graphqlRoot: Resolvers<Context> = {
 ////////////////////////////////////////////////////////////////////////////////////////
 /////////////////// SUBSCRIPTION BLOCK -- CONVERTION TO REDIS NEEDED ///////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
-      const listeningSession = check(
-        await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song'] })
-      )
-      const queueItem = new Queue()
-      queueItem.score = 0
-      queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
-      queueItem.song = song
-      queueItem.listeningSession = listeningSession
-      listeningSession.queue.push(queueItem)
-      check(await listeningSession.save())
-      const entityManager = getManager()
-      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, 'queueLength', 1))
-      ctx.pubsub.publish('QUEUE_UPDATE' + listeningSessionId, queueItem)
+      // const listeningSession = check(
+      //   await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song'] })
+      // )
+      // const queueItem = new Queue()
+      // queueItem.score = 0
+      // queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
+      // queueItem.song = song
+      // queueItem.listeningSession = listeningSession
+      // listeningSession.queue.push(queueItem)
+      // check(await listeningSession.save())
+      // const entityManager = getManager()
+      // check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, 'queueLength', 1))
+
 ////////////////////////////////////////////////////////////////////////////////////////
 /////////////////// SUBSCRIPTION BLOCK -- CONVERTION TO REDIS NEEDED ///////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,8 @@ export const graphqlRoot: Resolvers<Context> = {
      const queueLength = Number(listeningSessionQueueLength[0])
 
      const numQueueItems= await redis.incr("numQueueItems") //Incrementer to use for a unique id, race conditions???
-     const response = await redis.hmset(`queueItem:${numQueueItems}`, "id", numQueueItems, "score", 0, "position", queueLength + 1, "songId", songId) //should i store for song and listening session here??
+     const queueItem = {id: numQueueItems, score: 0, position: queueLength + 1, songId: songId };
+     const response = await redis.hmset(`queueItem:${numQueueItems}`, queueItem) //should i store for song and listening session here??
 
      if (response != "OK"){
        return false
@@ -160,6 +161,8 @@ export const graphqlRoot: Resolvers<Context> = {
     if (updateQueueLenResult == queueLength){
       return false
     }
+
+    pubsub.publish('QUEUE_UPDATE' + listeningSessionId, queueItem)
       return true
     },
     createPartyRocker: async (_, { input }, {redis}) => {
