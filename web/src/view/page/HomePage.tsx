@@ -129,8 +129,6 @@ export function HomePage(props: HomePageProps) {
         <H1>Cradio</H1>
         <H3>Start Listening Parties with you friends! Request Music!</H3>
         <H3>UCLA, Fall 2020</H3>
-        {username}
-        {sessionID}
         {/* {'\n'}
         {data?.listeningSession?.timeCreated} */}
       </Hero>
