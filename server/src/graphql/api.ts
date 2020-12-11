@@ -112,27 +112,6 @@ export const graphqlRoot: Resolvers<Context> = {
     //  // change this to saving the entity above???
     //  check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
 
-////////////////////////////////////////////////////////////////////////////////////////
-/////////////////// SUBSCRIPTION BLOCK -- CONVERTION TO REDIS NEEDED ///////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-      // const listeningSession = check(
-      //   await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song'] })
-      // )
-      // const queueItem = new Queue()
-      // queueItem.score = 0
-      // queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
-      // queueItem.song = song
-      // queueItem.listeningSession = listeningSession
-      // listeningSession.queue.push(queueItem)
-      // check(await listeningSession.save())
-      // const entityManager = getManager()
-      // check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, 'queueLength', 1))
-
-////////////////////////////////////////////////////////////////////////////////////////
-/////////////////// SUBSCRIPTION BLOCK -- CONVERTION TO REDIS NEEDED ///////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-
-
 
      //REDIS WAY
 
