@@ -14,7 +14,6 @@ export const fragmentQueue = gql`
   }
 `
 
-
 export const fetchQueue = gql`
   query FetchQueue($sessionId: Int!) {
   sessionQueue(sessionId: $sessionId ) {
@@ -24,6 +23,14 @@ export const fetchQueue = gql`
   ${fragmentQueue}
 `
 
+export const subscribeQueue = gql`
+  subscription QueueSubscription($sessionId: Int!) {
+    queueUpdates(sessionId: $sessionId){
+      ...Queue
+    }
+  }
+  ${fragmentQueue}
+`
 // export const subscribeSurveys = gql`
 //   subscription SurveySubscription($surveyId: Int!) {
 //     surveyUpdates(surveyId: $surveyId) {

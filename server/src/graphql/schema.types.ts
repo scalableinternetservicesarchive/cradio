@@ -1,6 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
   { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
@@ -87,10 +89,15 @@ export interface MutationDeleteListeningSessionArgs {
 export interface Subscription {
   __typename?: 'Subscription'
   surveyUpdates?: Maybe<Survey>
+  queueUpdates?: Maybe<Queue>
 }
 
 export interface SubscriptionSurveyUpdatesArgs {
   surveyId: Scalars['Int']
+}
+
+export interface SubscriptionQueueUpdatesArgs {
+  sessionId: Scalars['Int']
 }
 
 export interface User {
@@ -405,6 +412,13 @@ export type SubscriptionResolvers<
     ParentType,
     ContextType,
     RequireFields<SubscriptionSurveyUpdatesArgs, 'surveyId'>
+  >
+  queueUpdates?: SubscriptionResolver<
+    Maybe<ResolversTypes['Queue']>,
+    'queueUpdates',
+    ParentType,
+    ContextType,
+    RequireFields<SubscriptionQueueUpdatesArgs, 'sessionId'>
   >
 }
 

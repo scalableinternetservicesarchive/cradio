@@ -112,6 +112,26 @@ export const graphqlRoot: Resolvers<Context> = {
     //  // change this to saving the entity above???
     //  check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, "queueLength", 1))
 
+////////////////////////////////////////////////////////////////////////////////////////
+/////////////////// SUBSCRIPTION BLOCK -- CONVERTION TO REDIS NEEDED ///////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+      const listeningSession = check(
+        await ListeningSession.findOne({ where: { id: listeningSessionId }, relations: ['queue', 'queue.song'] })
+      )
+      const queueItem = new Queue()
+      queueItem.score = 0
+      queueItem.position = listeningSession.queueLength + 1 //assuming increment succeeds
+      queueItem.song = song
+      queueItem.listeningSession = listeningSession
+      listeningSession.queue.push(queueItem)
+      check(await listeningSession.save())
+      const entityManager = getManager()
+      check(await entityManager.increment(ListeningSession, { id: listeningSessionId }, 'queueLength', 1))
+      ctx.pubsub.publish('QUEUE_UPDATE' + listeningSessionId, queueItem)
+////////////////////////////////////////////////////////////////////////////////////////
+/////////////////// SUBSCRIPTION BLOCK -- CONVERTION TO REDIS NEEDED ///////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+
 
 
      //REDIS WAY
@@ -230,8 +250,6 @@ export const graphqlRoot: Resolvers<Context> = {
       }
 
       return true
-
-
     },
     joinListeningSession: async (_, { input }, {redis}) => {
       const { partyRockerId, sessionId } = input
@@ -263,7 +281,7 @@ export const graphqlRoot: Resolvers<Context> = {
       }
 
       return true
-    }
+    },
   },
   ListeningSession: {
     async queue(parent, args, {redis})  {
@@ -310,9 +328,13 @@ export const graphqlRoot: Resolvers<Context> = {
     }
   },
   Subscription: {
+    queueUpdates: {
+      subscribe: (_, { sessionId }, context) => context.pubsub.asyncIterator('QUEUE_UPDATE' + sessionId),
+      resolve: (payload: any) => payload,
+    },
     surveyUpdates: {
       subscribe: (_, { surveyId }, context) => context.pubsub.asyncIterator('SURVEY_UPDATE_' + surveyId),
       resolve: (payload: any) => payload,
     },
-  }
+  },
 }

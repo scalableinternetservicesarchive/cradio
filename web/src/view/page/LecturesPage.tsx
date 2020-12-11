@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client'
+import { useQuery, useSubscription } from '@apollo/client'
 import { Grid } from '@material-ui/core'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -15,12 +15,15 @@ import {
   FetchQueue,
   FetchQueueVariables,
   FetchSongs,
+  QueueSubscription,
+  QueueSubscriptionVariables
 } from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
-import { fetchQueue } from '../playground/fetchQueue'
+import { fetchQueue, subscribeQueue } from '../playground/fetchQueue'
 import { fetchSongs } from '../playground/fetchSong'
 import { addToQueue } from '../playground/mutateQueue'
+import { toast } from '../toast/toast'
 import { Page } from './Page'
 
 interface LecturesPageProps extends RouteComponentProps, AppRouteParams {}
@@ -53,12 +56,45 @@ export function LecturesPage(props: LecturesPageProps) {
     }
   )
 
-  //console.log(dataSongs)
-  // console.log(sessionData)
   const { loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
     variables: { sessionId: idSession },
   })
   console.log(queueData)
+
+  ///////////////////////////////////////////////////
+  const [sessionQueue, setSessionQueue] = React.useState(queueData?.sessionQueue)
+  React.useEffect(() => {
+    setSessionQueue(queueData?.sessionQueue)
+  }, [queueData])
+
+  console.log('THIS LINE', queueData?.sessionQueue)
+
+  // const sub = useSubscription<QueueSubscription>(subscribeQueue)
+  const sub = useSubscription<QueueSubscription, QueueSubscriptionVariables>(subscribeQueue, {
+    variables: { sessionId: idSession },
+  })
+
+  React.useEffect(() => {
+    if (sub?.data?.queueUpdates) {
+      // refetch().catch(handleError)
+      let item = sub.data?.queueUpdates
+      let tempQueueList = sessionQueue?.concat(item)
+      setSessionQueue(tempQueueList)
+      toast(item.song.name + ' added to the queue! 🕺💃🎉')
+    }
+  }, [sub?.data])
+
+  console.log(sessionQueue)
+  // console.log(sub.data)
+
+  // React.useEffect(() => {
+  //   if (sub.data?.candyUpdates) {
+  //     toast(sub.data?.candyUpdates.user.name + ' got candy! 🍭😋')
+  //     refetch().catch(handleError)
+  //   }
+  // }, [sub.data])
+
+  // console.log(queueData)
 
   // React.useEffect(() =>{console.log("session Data", sessionData)}, [sessionData]
   // );
@@ -106,7 +142,7 @@ export function LecturesPage(props: LecturesPageProps) {
           </Typography>
           <div className={classes.demo}>
             <List dense={dense}>
-              {queueData!.sessionQueue.map((currSong, index) => (
+              {sessionQueue?.map((currSong, index) => (
                 <ListItem key={index}>
                   <ListItemText primary={currSong.song.name} secondary={secondary ? 'Secondary text' : null} />
                 </ListItem>
