@@ -16,7 +16,7 @@ import {
   FetchQueueVariables,
   FetchSongs,
   QueueSubscription,
-  QueueSubscriptionVariables
+  QueueSubscriptionVariables,
 } from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'

@@ -13,71 +13,27 @@ import { Config } from './config'
 const Styletron = require('styletron-engine-monolithic')
 
 function isomorphicLink(req: Request, schema: any) {
-  //////////////////////////////////////////////////////////////////////
-  //////////////////// DON'T DELETE THIS BLOCK /////////////////////////
-  console.log('Log schema so its not deleted: ', schema)
-  console.log('Log req so its not deleted: ', req)
-  new SchemaLink({ schema })
-  new HttpLink({
-    uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
-    credentials: 'same-origin',
-    fetch: async (uri: any, options: any) => {
-      const reqBody = JSON.parse(options!.body! as string)
-      const opName = reqBody.operationName
-      const actionName = reqBody.variables?.action?.actionName
-      const authToken = req.cookies.authToken
-      const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
-      return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
-        ...options,
-        headers,
-      })
-    },
-  })
-  /////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////
-
-  ///////// **Test SchemaLink** /////////   <----1
-  // return new SchemaLink({ schema })
-
-  ///////// **Test HttpLink** /////////     <----2
-  return new HttpLink({
-    uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
-    credentials: 'same-origin',
-    fetch: async (uri: any, options: any) => {
-      const reqBody = JSON.parse(options!.body! as string)
-      const opName = reqBody.operationName
-      const actionName = reqBody.variables?.action?.actionName
-      const authToken = req.cookies.authToken
-      const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
-      return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
-        ...options,
-        headers,
-      })
-    },
-  })
-
-  /////////// **Isomorphic Link -- ACTUAL CODE** /////////
-  // if (typeof window === 'undefined') {
-  //   // server
-  //   return new SchemaLink({ schema })
-  // } else {
-  //   // client
-  //   return new HttpLink({
-  //     uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
-  //     credentials: 'same-origin',
-  //     fetch: async (uri: any, options: any) => {
-  //       const reqBody = JSON.parse(options!.body! as string)
-  //       const opName = reqBody.operationName
-  //       const actionName = reqBody.variables?.action?.actionName
-  //       const authToken = req.cookies.authToken
-  //       const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
-  //       return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
-  //         ...options,
-  //         headers,
-  //       })
-  //     },
-  //   })
-  // }
+  if (typeof window === 'undefined') {
+    // server side render
+    return new SchemaLink({ schema })
+  } else {
+    // client side render
+    return new HttpLink({
+      uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
+      credentials: 'same-origin',
+      fetch: async (uri: any, options: any) => {
+        const reqBody = JSON.parse(options!.body! as string)
+        const opName = reqBody.operationName
+        const actionName = reqBody.variables?.action?.actionName
+        const authToken = req.cookies.authToken
+        const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
+        return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
+          ...options,
+          headers,
+        })
+      },
+    })
+  }
 }
 
 export function renderApp(req: Request, res: Response, schema: any) {

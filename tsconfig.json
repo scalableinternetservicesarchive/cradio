@@ -31,6 +31,6 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": false,
     "types": ["jest", "node"], // see: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/33311
-    "skipLibCheck": true,
+    "skipLibCheck": true
   }
 }

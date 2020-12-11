@@ -11,5 +11,4 @@ const LoginTemplate: Story = args => <LoginComponent {...args} />
 export const Login = LoginTemplate.bind({})
 Login.args = {
   surveyId: 1,
-
 }

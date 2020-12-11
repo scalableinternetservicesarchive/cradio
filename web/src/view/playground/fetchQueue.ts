@@ -27,7 +27,7 @@ export const fetchQueue = gql`
 
 export const subscribeQueue = gql`
   subscription QueueSubscription($sessionId: Int!) {
-    queueUpdates(sessionId: $sessionId){
+    queueUpdates(sessionId: $sessionId) {
       ...Queue
     }
   }
