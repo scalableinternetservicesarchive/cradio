@@ -11,7 +11,6 @@ import { SurveyQuestion } from '../entities/SurveyQuestion'
 import { User } from '../entities/User'
 import { Resolvers } from './schema.types'
 
-
 //Redis "Schema":
 
 //entity for each indicivual queue item  (ID here is a unique id for the queue item)
@@ -23,10 +22,10 @@ import { Resolvers } from './schema.types'
 //Entity for each queue (a set of queue ids) the key includes the listening session id
 // listeningSession:<listeningSessionId>:queue set([id1, id2, …. ])
 
- //entity for each indicivual party rocker  (ID here is a unique id for the queue item)
+//entity for each indicivual party rocker  (ID here is a unique id for the queue item)
 // partyRocker:<ID> {  }
 
- //Entity for each list of party rockers within a queue (a set of party rocke ids) the key includes the listening session id
+//Entity for each list of party rockers within a queue (a set of party rocke ids) the key includes the listening session id
 // listeningSession:<listeningSessionId>:partyRockers set([id1, id2, …. ])
 
 export const pubsub = new PubSub()
@@ -49,19 +48,22 @@ export const graphqlRoot: Resolvers<Context> = {
   Query: {
     self: (_, args, ctx) => ctx.user,
     survey: async (_, { surveyId }) => (await Survey.findOne({ where: { id: surveyId } })) || null,
-    listeningSession: async (_, { sessionId }, {redis}) => { const result = await redis.hgetall(`listeningSession:${sessionId}`)
-    console.log("query result:", result)
-  return result as any || null},
-    sessionQueue: async (_, { sessionId }, {redis}) => {
-    const queueItemIds = await redis.smembers(`listeningSession:${sessionId}:queue`) //Get the Ids (keys) of the items you wanna fetch
-    const promises = queueItemIds.map(async (item, index) =>  redis.hgetall(`queueItem:${item}`))
-    const queueItems = await Promise.all(promises)
-    console.log("queue items result", queueItems)
-    return queueItems as any || null }, //do we want this null???
+    listeningSession: async (_, { sessionId }, { redis }) => {
+      const result = await redis.hgetall(`listeningSession:${sessionId}`)
+      console.log('query result:', result)
+      return (result as any) || null
+    },
+    sessionQueue: async (_, { sessionId }, { redis }) => {
+      const queueItemIds = await redis.smembers(`listeningSession:${sessionId}:queue`) //Get the Ids (keys) of the items you wanna fetch
+      const promises = queueItemIds.map(async (item, index) => redis.hgetall(`queueItem:${item}`))
+      const queueItems = await Promise.all(promises)
+      console.log('queue items result', queueItems)
+      return (queueItems as any) || null
+    }, //do we want this null???
     surveys: () => Survey.find(),
     //partyRockers: async () => await PartyRocker.find(), //does anyone use this??
-    songs: async () => await Song.find({relations: ['artist']}),
-    song: async (_, { songName }) => (await Song.find({ where: { name: songName }, relations: ['artist'] }))
+    songs: async () => await Song.find({ relations: ['artist'] }),
+    song: async (_, { songName }) => await Song.find({ where: { name: songName }, relations: ['artist'] }),
   },
   Mutation: {
     answerSurvey: async (_, { input }, ctx) => {
@@ -86,6 +88,7 @@ export const graphqlRoot: Resolvers<Context> = {
       ctx.pubsub.publish('SURVEY_UPDATE_' + surveyId, survey)
       return survey
     },
+
     addToQueue: async (_, { input }, {redis, pubsub}) => {
       const { songId, listeningSessionId } = input
       const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
@@ -144,13 +147,13 @@ export const graphqlRoot: Resolvers<Context> = {
     pubsub.publish('QUEUE_UPDATE' + listeningSessionId, queueItem)
       return true
     },
-    createPartyRocker: async (_, { input }, {redis}) => {
+    createPartyRocker: async (_, { input }, { redis }) => {
       const { name } = input
 
-      const numPartyRockers = await redis.incr("numPartyRockers")
-      const response = await redis.hmset(`partyRocker:${numPartyRockers}`, "id", numPartyRockers, "name", name) //should i store empty strings here??
-      console.log("hmset response create party rocker", response)
-      let partyRocker = {id: numPartyRockers, name: name, spotifyCreds: ""} //add listnein session here??
+      const numPartyRockers = await redis.incr('numPartyRockers')
+      const response = await redis.hmset(`partyRocker:${numPartyRockers}`, 'id', numPartyRockers, 'name', name) //should i store empty strings here??
+      console.log('hmset response create party rocker', response)
+      let partyRocker = { id: numPartyRockers, name: name, spotifyCreds: '' } //add listnein session here??
 
       // const partyRocker = new PartyRocker()
       // partyRocker.name = name
@@ -158,34 +161,38 @@ export const graphqlRoot: Resolvers<Context> = {
 
       return partyRocker
     },
-    createListeningSession: async (_, { partyRockerId }, {redis}) => {
+    createListeningSession: async (_, { partyRockerId }, { redis }) => {
       //const owner = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
-//       console.log(owner)
+      //       console.log(owner)
 
-
-      const partyRockerOwner = await redis.hmget(`partyRocker:${partyRockerId}`, "id")
-      console.log("owner id from redis", partyRockerOwner)
+      const partyRockerOwner = await redis.hmget(`partyRocker:${partyRockerId}`, 'id')
+      console.log('owner id from redis', partyRockerOwner)
       //let ownerId:Number;
       if (partyRockerOwner === undefined || partyRockerOwner[0] == null) {
         // array empty or does not exist
-          console.log("party rocker does not exist, need an owner for the session")
-          throw new Error("Party Rocker with that ID does not exist")
-          //add error check here!
+        console.log('party rocker does not exist, need an owner for the session')
+        throw new Error('Party Rocker with that ID does not exist')
+        //add error check here!
       }
-      const ownerId = Number(partyRockerOwner[0]);
+      const ownerId = Number(partyRockerOwner[0])
       const secondsSinceEpoch = Math.round(Date.now() / 1000)
-      const numListeningSessions = await redis.incr("numListeningSessions")
+      const numListeningSessions = await redis.incr('numListeningSessions')
 
-      const listeningSession = {id: numListeningSessions, timeCreated: secondsSinceEpoch, queueLength: 0, owner: ownerId}
+      const listeningSession = {
+        id: numListeningSessions,
+        timeCreated: secondsSinceEpoch,
+        queueLength: 0,
+        owner: ownerId,
+      }
 
       const listeningSessionRedis = await redis.hmset(`listeningSession:${numListeningSessions}`, listeningSession)
-      console.log("session creation result", listeningSessionRedis)
+      console.log('session creation result', listeningSessionRedis)
       // const listeningSessionResult = await redis.hgetall(`listeningSession:${numListeningSessions}`)
       // console.log("creation result", listeningSessionResult)
 
       const numIdsAdded = await redis.sadd(`listeningSession:${numListeningSessions}:partyRockers`, ownerId)
-      if (numIdsAdded == 0){
-        throw new Error("Error Adding Owner to list of rockers in listening session")
+      if (numIdsAdded == 0) {
+        throw new Error('Error Adding Owner to list of rockers in listening session')
       }
 
       //OLD CODE WHEN USING SQL TYPE ORM
@@ -200,40 +207,39 @@ export const graphqlRoot: Resolvers<Context> = {
       // owner.listeningSession = listeningSession
       // await owner.save()
 
-
       return listeningSession as any
       //return listeningSessionResult
     },
-    deleteListeningSession: async (_, { sessionId }, {redis}) => {
-
-
+    deleteListeningSession: async (_, { sessionId }, { redis }) => {
       // const entityManager = getManager();
       // check(await entityManager.delete(ListeningSession, { id: sessionId }))
 
       const queueItemIds = await redis.smembers(`listeningSession:${sessionId}:queue`)
-      queueItemIds.forEach(async queueItemId => { const queueItemDelete = await redis.del(`queueItem:${queueItemId}`)
-         console.log("queue item delete result: ", queueItemDelete)}
-        )
+      queueItemIds.forEach(async queueItemId => {
+        const queueItemDelete = await redis.del(`queueItem:${queueItemId}`)
+        console.log('queue item delete result: ', queueItemDelete)
+      })
 
       const deleteQueueResult = await redis.del(`listeningSession:${sessionId}:queue`)
-      console.log("number of keys removed ", deleteQueueResult)
+      console.log('number of keys removed ', deleteQueueResult)
 
       const partyRockerIds = await redis.smembers(`listeningSession:${sessionId}:partyRockers`)
-      partyRockerIds.forEach(async partyRockerId => { const partyRockerDelete = await redis.del(`partyRocker:${partyRockerId}`)
-         console.log("partyRocker delete result: ", partyRockerDelete)}
-        )
+      partyRockerIds.forEach(async partyRockerId => {
+        const partyRockerDelete = await redis.del(`partyRocker:${partyRockerId}`)
+        console.log('partyRocker delete result: ', partyRockerDelete)
+      })
 
       const deletePartyRockers = await redis.del(`listeningSession:${sessionId}:partyRockers`)
-      console.log("number of keys removed (party Rockers) ", deletePartyRockers)
+      console.log('number of keys removed (party Rockers) ', deletePartyRockers)
 
       const deleteSessionResult = await redis.del(`listeningSession:${sessionId}`)
-      if (deleteSessionResult <=0 ){
-       return false
+      if (deleteSessionResult <= 0) {
+        return false
       }
 
       return true
     },
-    joinListeningSession: async (_, { input }, {redis}) => {
+    joinListeningSession: async (_, { input }, { redis }) => {
       const { partyRockerId, sessionId } = input
       // const partyRocker = check(await PartyRocker.findOne({ where: { id: partyRockerId }, relations: ['listeningSession']}))
       // const listeningSession = check(await ListeningSession.findOne({ where: { id: sessionId }, relations: ['partyRockers']}))
@@ -244,21 +250,20 @@ export const graphqlRoot: Resolvers<Context> = {
       // partyRocker.listeningSession = listeningSession
       // await partyRocker.save()
 
-
       const rockerExists = await redis.exists(`partyRocker:${partyRockerId}`)
-      if (rockerExists == 0){
+      if (rockerExists == 0) {
         return false
       }
 
       //Add listening session relationship here for the party rocker entity
 
       const sessionExists = await redis.exists(`listeningSession:${sessionId}`)
-      if (sessionExists == 0){
+      if (sessionExists == 0) {
         return false
       }
 
       const numIdsAdded = await redis.sadd(`listeningSession:${sessionId}:partyRockers`, partyRockerId)
-      if (numIdsAdded == 0){
+      if (numIdsAdded == 0) {
         return false
       }
 
@@ -266,7 +271,7 @@ export const graphqlRoot: Resolvers<Context> = {
     },
   },
   ListeningSession: {
-    async queue(parent, args, {redis})  {
+    async queue(parent, args, { redis }) {
       const queueItemIds = await redis.smembers(`listeningSession:${parent.id}:queue`) //Get the Ids (keys) of the items you wanna fetch
       // const result: any[] = []
       // //for each Id fetch the item from redis and push the retrieved item into the result list
@@ -275,39 +280,35 @@ export const graphqlRoot: Resolvers<Context> = {
       //    console.log("queue item searh result: ", queueItem)}
       //   )
 
-
-      const promises = queueItemIds.map(async (item, index) =>  redis.hgetall(`queueItem:${item}`))
+      const promises = queueItemIds.map(async (item, index) => redis.hgetall(`queueItem:${item}`))
       const queueItems = await Promise.all(promises)
-      console.log("queue items result", queueItems)
+      console.log('queue items result', queueItems)
 
       return queueItems as any
-
     },
-    async partyRockers(parent, args, {redis})  {
+    async partyRockers(parent, args, { redis }) {
       const partyRockerIds = await redis.smembers(`listeningSession:${parent.id}:partyRockers`)
       // let result: any[] = [] //what to do about this???
       // partyRockerIds.forEach(async partyRockerId => { const partyRocker = await redis.hgetall(`partyRocker:${partyRockerId}`)
       // console.log("party rocker to add to list: ", partyRocker)
       //   result.push(partyRocker)})
 
-
-        const promises = partyRockerIds.map(async (item, index) =>  redis.hgetall(`partyRocker:${item}`))
-        const partyRockers = await Promise.all(promises)
-        console.log("party rockers result", partyRockers)
+      const promises = partyRockerIds.map(async (item, index) => redis.hgetall(`partyRocker:${item}`))
+      const partyRockers = await Promise.all(promises)
+      console.log('party rockers result', partyRockers)
       return partyRockers as any
-
     },
-    async owner(parent, args, {redis})  {
+    async owner(parent, args, { redis }) {
       const owner = await redis.hgetall(`partyRocker:${parent.owner}`)
       return owner as any
-    }
+    },
   },
   Queue: {
-    async song(parent, args, {redis})  {
-      const songId = await redis.hget(`queueItem:${parent.id}`, "songId") //Maybe change this to speed up?
+    async song(parent, args, { redis }) {
+      const songId = await redis.hget(`queueItem:${parent.id}`, 'songId') //Maybe change this to speed up?
       const song = check(await Song.findOne({ where: { id: songId }, relations: ['artist'] }))
       return song
-    }
+    },
   },
   Subscription: {
     queueUpdates: {

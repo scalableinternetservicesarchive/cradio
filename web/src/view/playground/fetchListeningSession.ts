@@ -6,8 +6,7 @@ export const fragmentListeningSession = gql`
   fragment ListeningSession on ListeningSession {
     id
     timeCreated
-    owner
-    {
+    owner {
       ...PartyRocker
     }
     partyRockers {
@@ -16,10 +15,9 @@ export const fragmentListeningSession = gql`
   }
 `
 
-
 export const fetchListeningSession = gql`
   query FetchListeningSession($sessionId: Int!) {
-    listeningSession(sessionId: $sessionId ) {
+    listeningSession(sessionId: $sessionId) {
       ...ListeningSession
     }
   }

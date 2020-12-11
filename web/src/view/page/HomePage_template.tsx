@@ -17,7 +17,7 @@ export function HomePage(props: HomePageProps) {
         <H3>Start Listening Parties with you friends! Request Music!</H3>
         <H3>UCLA, Fall 2020</H3>
       </Hero>
-      <img src={"/app/assets/cradio.png"}/>
+      <img src={'/app/assets/cradio.png'} />
       <Login />
     </Page>
   )

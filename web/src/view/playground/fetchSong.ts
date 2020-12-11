@@ -1,6 +1,5 @@
 import { gql } from '@apollo/client'
 
-
 // export const fragmentSurvey = gql`
 //   fragment Survey on Survey {
 //     id
@@ -34,10 +33,9 @@ export const fetchSongs = gql`
   ${fragmentSong}
 `
 
-
 export const fetchSong = gql`
   query FetchSong($songName: String!) {
-    song(songName: $songName){
+    song(songName: $songName) {
       ...Song
     }
   }

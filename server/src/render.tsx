@@ -12,29 +12,72 @@ import { Config } from './config'
 
 const Styletron = require('styletron-engine-monolithic')
 
-//test push
 function isomorphicLink(req: Request, schema: any) {
-  if (typeof window === "undefined") {
-    // server
-    return new SchemaLink({ schema })
-  } else {
-    // client
-    return new HttpLink({
-      uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
-      credentials: 'same-origin',
-      fetch: async (uri: any, options: any) => {
-        const reqBody = JSON.parse(options!.body! as string)
-        const opName = reqBody.operationName
-        const actionName = reqBody.variables?.action?.actionName
-        const authToken = req.cookies.authToken
-        const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
-        return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
-          ...options,
-          headers,
-        })
-      },
-    })
-  }
+  //////////////////////////////////////////////////////////////////////
+  //////////////////// DON'T DELETE THIS BLOCK /////////////////////////
+  console.log('Log schema so its not deleted: ', schema)
+  console.log('Log req so its not deleted: ', req)
+  new SchemaLink({ schema })
+  new HttpLink({
+    uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
+    credentials: 'same-origin',
+    fetch: async (uri: any, options: any) => {
+      const reqBody = JSON.parse(options!.body! as string)
+      const opName = reqBody.operationName
+      const actionName = reqBody.variables?.action?.actionName
+      const authToken = req.cookies.authToken
+      const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
+      return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
+        ...options,
+        headers,
+      })
+    },
+  })
+  /////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////
+
+  ///////// **Test SchemaLink** /////////   <----1
+  // return new SchemaLink({ schema })
+
+  ///////// **Test HttpLink** /////////     <----2
+  return new HttpLink({
+    uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
+    credentials: 'same-origin',
+    fetch: async (uri: any, options: any) => {
+      const reqBody = JSON.parse(options!.body! as string)
+      const opName = reqBody.operationName
+      const actionName = reqBody.variables?.action?.actionName
+      const authToken = req.cookies.authToken
+      const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
+      return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
+        ...options,
+        headers,
+      })
+    },
+  })
+
+  /////////// **Isomorphic Link -- ACTUAL CODE** /////////
+  // if (typeof window === 'undefined') {
+  //   // server
+  //   return new SchemaLink({ schema })
+  // } else {
+  //   // client
+  //   return new HttpLink({
+  //     uri: `http://127.0.0.1:${Config.appserverPort}/graphql`,
+  //     credentials: 'same-origin',
+  //     fetch: async (uri: any, options: any) => {
+  //       const reqBody = JSON.parse(options!.body! as string)
+  //       const opName = reqBody.operationName
+  //       const actionName = reqBody.variables?.action?.actionName
+  //       const authToken = req.cookies.authToken
+  //       const headers = authToken ? { ...options.headers, 'x-authtoken': authToken } : options.headers
+  //       return fetch(`${uri}?opName=${opName}${actionName ? `&actionName=${actionName}` : ''}`, {
+  //         ...options,
+  //         headers,
+  //       })
+  //     },
+  //   })
+  // }
 }
 
 export function renderApp(req: Request, res: Response, schema: any) {
@@ -69,16 +112,20 @@ export function renderApp(req: Request, res: Response, schema: any) {
             <link rel="shortcut icon" href={`/app/assets/favicon${Config.isProd ? '' : '-dev'}.ico`} />
             <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
             <link rel="stylesheet" href="/app/css/app.css" />
-            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossOrigin="anonymous" />
-            <script src="https://unpkg.com/react/umd/react.production.min.js" crossOrigin='true'></script>
+            <link
+              rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+              integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+              crossOrigin="anonymous"
+            />
+            <script src="https://unpkg.com/react/umd/react.production.min.js" crossOrigin="true"></script>
 
-            <script
-              src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"
-              crossOrigin='true'></script>
+            <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js" crossOrigin="true"></script>
 
             <script
               src="https://unpkg.com/react-bootstrap@next/dist/react-bootstrap.min.js"
-              crossOrigin='true'></script>
+              crossOrigin="true"
+            ></script>
             <script
               dangerouslySetInnerHTML={{
                 __html: `window.app = {
