@@ -23,6 +23,7 @@ import { fetchListeningSession } from '../playground/fetchListeningSession'
 import { fetchQueue, subscribeQueue } from '../playground/fetchQueue'
 import { fetchSongs } from '../playground/fetchSong'
 import { addToQueue } from '../playground/mutateQueue'
+import { handleError } from '../toast/error'
 import { toast } from '../toast/toast'
 import { Page } from './Page'
 
@@ -45,7 +46,7 @@ export function LecturesPage(props: LecturesPageProps) {
   const idSession = Number(props.sessionId)
   const classes = useStyles()
   const [dense] = React.useState(false)
-  const [songQueue, setQueue] = React.useState<Array<string>>([])
+  //const [songQueue, setQueue] = React.useState<Array<string>>([])
   const [secondary] = React.useState(false)
   const { loading: loadingSongs, data: dataSongs } = useQuery<FetchSongs>(fetchSongs)
   // add `data: sessionData` to `const { loading: loadingSession }` on line 45 if you want to use the console.log on line 53.
@@ -55,17 +56,17 @@ export function LecturesPage(props: LecturesPageProps) {
       variables: { sessionId: idSession },
     }
   )
-
-  const { loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
+  //console.log(songQueue)
+  const { loading: loadingQueue, data: queueData, refetch } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
     variables: { sessionId: idSession },
   })
   console.log(queueData)
 
   ///////////////////////////////////////////////////
   const [sessionQueue, setSessionQueue] = React.useState(queueData?.sessionQueue)
-  React.useEffect(() => {
-    setSessionQueue(queueData?.sessionQueue)
-  }, [queueData])
+   React.useEffect(() => {
+     setSessionQueue(queueData?.sessionQueue)
+   }, [queueData])
 
   console.log('THIS LINE', queueData?.sessionQueue)
 
@@ -76,11 +77,12 @@ export function LecturesPage(props: LecturesPageProps) {
 
   React.useEffect(() => {
     if (sub?.data?.queueUpdates) {
-      // refetch().catch(handleError)
+
       let item = sub.data?.queueUpdates
       let tempQueueList = sessionQueue?.concat(item)
       setSessionQueue(tempQueueList)
       toast(item.song.name + ' added to the queue! 🕺💃🎉')
+      refetch().catch(handleError)
     }
   }, [sub?.data])
 
@@ -113,6 +115,9 @@ export function LecturesPage(props: LecturesPageProps) {
 
   return (
     <Page>
+      <div>
+        Session Id: {idSession}
+      </div>
       <Grid container>
         <Grid item xs={12} md={6}>
           <Typography variant="h6" className={classes.title}>
@@ -125,7 +130,7 @@ export function LecturesPage(props: LecturesPageProps) {
                   <ListItemIcon>
                     <AddIcon
                       onClick={() => {
-                        setQueue(current => [...current, currSong.name])
+                        //setQueue(current => [...current, currSong.name])
                         addToQueue({ songId: currSong.id, listeningSessionId: idSession })
                       }}
                     />
@@ -147,11 +152,11 @@ export function LecturesPage(props: LecturesPageProps) {
                   <ListItemText primary={currSong.song.name} secondary={secondary ? 'Secondary text' : null} />
                 </ListItem>
               ))}
-              {songQueue.map((currSong, index) => (
+              {/* {songQueue.map((currSong, index) => (
                 <ListItem key={index}>
-                  <ListItemText primary={currSong} secondary={secondary ? 'Secondary text' : null} />
+                  <ListItemText primary={"Song Queue: " + currSong} secondary={secondary ? 'Secondary text' : null} />
                 </ListItem>
-              ))}
+              ))} */}
             </List>
           </div>
         </Grid>
