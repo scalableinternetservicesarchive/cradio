@@ -24,6 +24,6 @@ export class ListeningSession extends BaseEntity {
   //@OneToMany(type => PartyRocker, partyRocker => partyRocker.listeningSession)
   partyRockers: PartyRocker[]
 
-  @OneToMany(type => Queue, queue => queue.listeningSession)
+  @OneToMany(type => Queue, queue => queue.listeningSession, {cascade: true})
   queue: Queue[]
 }

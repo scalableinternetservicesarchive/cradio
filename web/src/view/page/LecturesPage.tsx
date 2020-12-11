@@ -16,14 +16,13 @@ import {
   FetchQueueVariables,
   FetchSongs,
   QueueSubscription,
-  QueueSubscriptionVariables,
+  QueueSubscriptionVariables
 } from '../../graphql/query.gen'
 import { AppRouteParams } from '../nav/route'
 import { fetchListeningSession } from '../playground/fetchListeningSession'
 import { fetchQueue, subscribeQueue } from '../playground/fetchQueue'
 import { fetchSongs } from '../playground/fetchSong'
 import { addToQueue } from '../playground/mutateQueue'
-import { handleError } from '../toast/error'
 import { toast } from '../toast/toast'
 import { Page } from './Page'
 
@@ -57,7 +56,7 @@ export function LecturesPage(props: LecturesPageProps) {
     }
   )
 
-  const { loading: loadingQueue, data: queueData, refetch } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
+  const { loading: loadingQueue, data: queueData } = useQuery<FetchQueue, FetchQueueVariables>(fetchQueue, {
     variables: { sessionId: idSession },
   })
   // ^might need to grab a refetch so can use refetch()
@@ -76,12 +75,14 @@ export function LecturesPage(props: LecturesPageProps) {
   })
 
   React.useEffect(() => {
-    if (sub.data?.queueUpdates) {
-      refetch().catch(handleError)
-      toast(sub.data?.queueUpdates.song + ' added to the queue! 🕺💃🎉')
-      // setSessionQueue(sub.data.queueUpdates.listeningSession)
+    if (sub?.data?.queueUpdates) {
+      // refetch().catch(handleError)
+      let item = sub.data?.queueUpdates
+      let tempQueueList = sessionQueue?.concat(item)
+      setSessionQueue(tempQueueList)
+      toast(item.song.name + ' added to the queue! 🕺💃🎉')
     }
-  }, [sub.data])
+  }, [sub?.data])
 
   console.log(sessionQueue)
   // console.log(sub.data)
@@ -141,7 +142,7 @@ export function LecturesPage(props: LecturesPageProps) {
           </Typography>
           <div className={classes.demo}>
             <List dense={dense}>
-              {queueData!.sessionQueue.map((currSong, index) => (
+              {sessionQueue?.map((currSong, index) => (
                 <ListItem key={index}>
                   <ListItemText primary={currSong.song.name} secondary={secondary ? 'Secondary text' : null} />
                 </ListItem>
