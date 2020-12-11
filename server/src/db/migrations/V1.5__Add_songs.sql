@@ -4,3 +4,10 @@ insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Basket Cas
 insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Just the Way You Are', 222, 'Pop', 3);
 insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Rolling in the Deep', 130, 'Pop', 4);
 insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Hero', 150, 'Spanish Pop', 5);
+insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('All Star', 150, 'Rock', 6);
+insert into `song` (`name`, `duration`, `genre`, `artistId`) values ("I'm A Beliver - Radio Edit", 150, 'Rock', 6);
+insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Rockstar', 150, 'Rock', 7);
+insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Je pense à toi', 150, 'Electro Soul', 8);
+insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Décollage (feat. Lou Lou Ghelichkani)', 150, 'Frenfth Pop', 9);
+insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Grace & Mercy', 150, 'Rap', 10);
+insert into `song` (`name`, `duration`, `genre`, `artistId`) values ('Mr. Carter (Feat. Jay-Z)', 150, 'Rap', 11);
